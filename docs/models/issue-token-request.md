@@ -1,0 +1,23 @@
+# IssueTokenRequest
+
+## Example Usage
+
+```typescript
+import { IssueTokenRequest } from "fluidapi/models";
+
+let value: IssueTokenRequest = {
+  grantType: "client_credentials",
+  clientId: "fld-cred-acme-corp--api--postman-primary",
+  clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
+  scope: "fluid:api",
+};
+```
+
+## Fields
+
+| Field                                                                                                                                       | Type                                                                                                                                        | Required                                                                                                                                    | Description                                                                                                                                 | Example                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `grantType`                                                                                                                                 | [models.GrantType](../models/grant-type.md)                                                                                                 | :heavy_check_mark:                                                                                                                          | N/A                                                                                                                                         | client_credentials                                                                                                                          |
+| `clientId`                                                                                                                                  | *string*                                                                                                                                    | :heavy_check_mark:                                                                                                                          | N/A                                                                                                                                         | fld-cred-acme-corp--api--postman-primary                                                                                                    |
+| `clientSecret`                                                                                                                              | *string*                                                                                                                                    | :heavy_check_mark:                                                                                                                          | N/A                                                                                                                                         | dGhpcyBpcyBhIHNlY3JldA                                                                                                                      |
+| `scope`                                                                                                                                     | *string*                                                                                                                                    | :heavy_minus_sign:                                                                                                                          | Space-separated list of scopes to request. Must be a subset of the<br/>scopes configured for the tenant. Omit to request all available scopes.<br/> | fluid:api                                                                                                                                   |

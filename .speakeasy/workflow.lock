@@ -1,0 +1,31 @@
+speakeasyVersion: 1.755.0
+sources:
+    auth:
+        sourceNamespace: auth
+        sourceRevisionDigest: sha256:3e20ccecb3628340bff36b2203493995491e30b9013aa28a7426018364c96ec4
+        sourceBlobDigest: sha256:8090e304a1e7b9cda9e47561d324c2828aeedcf4ad5d0f1931d8ea0aabd64bda
+        tags:
+            - latest
+            - 1.0.0
+targets:
+    fluidapi:
+        source: auth
+        sourceNamespace: auth
+        sourceRevisionDigest: sha256:3e20ccecb3628340bff36b2203493995491e30b9013aa28a7426018364c96ec4
+        sourceBlobDigest: sha256:8090e304a1e7b9cda9e47561d324c2828aeedcf4ad5d0f1931d8ea0aabd64bda
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        auth:
+            inputs:
+                - location: ../public.yaml
+            registry:
+                location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
+    targets:
+        fluidapi:
+            target: typescript
+            source: auth
+            publish:
+                npm:
+                    token: $npm_token

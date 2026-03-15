@@ -1,0 +1,541 @@
+openapi: "3.1.0"
+
+info:
+  title: Fluid Token API — Public
+  description: |
+    Public contract for token issuance and token-related public endpoints.
+
+    ## Authentication
+
+    - **`/oauth2/token`** — public endpoint, no authentication required (client authenticates via `client_id` + `client_secret`).
+    - **`/oauth2/token-fluid`** — public endpoint for Fluid-signed M2M JWT issuance.
+    - **`/users/token`** — public endpoint for end-user token issuance. Supports Bearer M2M or HTTP Basic Auth.
+    - **`/.well-known/jwks.json`** — public key discovery for Fluid-signed JWT validation.
+
+    ## Scopes
+
+    | Scope | Description |
+    |---|---|
+    | `fluid:api` | Full access to the Fluid API |
+  version: "1.0.0"
+  contact:
+    name: Fluid API Team
+    email: api@fluidapi.com
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+
+servers:
+  - url: "{scheme}://{host}"
+    description: Configurable environment
+    variables:
+      scheme:
+        default: https
+        enum: [http, https]
+      host:
+        default: id.dev.api.fluidapi.io
+        enum:
+          - id.dev.api.fluidapi.io
+          - id.api.fluidapi.io
+          - localhost:9999
+
+security: []
+
+tags:
+  - name: tokens
+    description: Public — Token issuance for tenants
+  - name: metadata
+    description: Public — Metadata and health endpoints
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags: [metadata]
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: UP
+        "503":
+          description: Service health could not be evaluated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: health_check_error
+                  message: failed to evaluate service health
+
+  /.well-known/jwks.json:
+    get:
+      summary: Get public signing keys
+      description: Returns the JWKS used to validate Fluid-signed JWTs.
+      operationId: getJWKS
+      tags: [metadata]
+      responses:
+        "200":
+          description: JWK set returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWKSet"
+              example:
+                keys:
+                  - kty: RSA
+                    kid: OT9A3u8xcG53oZKbMb7yvr7vb3IkKcJYyjR3ea5pij8
+                    use: sig
+                    alg: RS256
+                    n: "1fi9UyLM..."
+                    e: AQAB
+        "503":
+          description: JWKS temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: jwks_error
+                  message: failed to load jwks
+
+  /oauth2/token:
+    post:
+      summary: Issue access token (client_credentials)
+      description: |
+        Standard OAuth2 token endpoint. Performs a `client_credentials` grant
+        against the Authorization Server and returns the access token (JWT).
+
+        The OAuth2 client must be registered first via
+        `POST /v1/tenants/{tenant_id}/credentials`.
+
+        ### Scope reduction
+
+        By default the token is issued with all scopes configured for the tenant.
+        You can request a subset by passing `scope` in the form body.
+        Requesting a scope not in the tenant's allowlist returns `400 invalid_scope`.
+
+        **Available scopes:** `fluid:api`
+      operationId: issueToken
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/IssueTokenRequest"
+            examples:
+              default_scope:
+                summary: Default (all scopes)
+                value:
+                  grant_type: client_credentials
+                  client_id: fld-cred-acme-corp--api--postman-primary
+                  client_secret: dGhpcyBpcyBhIHNlY3JldA
+              reduced_scope:
+                summary: Reduced scope
+                value:
+                  grant_type: client_credentials
+                  client_id: fld-cred-acme-corp--api--postman-primary
+                  client_secret: dGhpcyBpcyBhIHNlY3JldA
+                  scope: "fluid:api"
+      responses:
+        "200":
+          description: Access token issued
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OKResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/TokenData"
+              example:
+                ok: true
+                data:
+                  access_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  token_type: bearer
+                  expires_in: 3600
+                  scope: "fluid:api"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: invalid_client
+                  message: invalid client credentials
+        "502":
+          $ref: "#/components/responses/BadGateway"
+
+  /oauth2/token-fluid:
+    post:
+      summary: Issue Fluid-signed M2M token
+      description: |
+        Validates client credentials against the Authorization Server and then
+        generates a JWT signed by Fluid.
+
+        This endpoint coexists with `/oauth2/token`.
+        Use `/oauth2/token` when you want the standard Hydra-backed token flow.
+        Use `/oauth2/token-fluid` when you need a Fluid-signed JWT carrying
+        `workspace_id`, `tenant_id`, `client_id`, and `credential_type` claims for M2M calls.
+      operationId: issueFluidToken
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/IssueTokenRequest"
+      responses:
+        "200":
+          description: Fluid-signed M2M token issued
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OKResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/TokenData"
+              example:
+                ok: true
+                data:
+                  access_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+                  token_type: bearer
+                  expires_in: 3600
+                  scope: "fluid:api"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: invalid_client
+                  message: invalid client credentials
+        "502":
+          $ref: "#/components/responses/BadGateway"
+
+  /users/token:
+    post:
+      summary: Issue end-user token
+      description: |
+        Issues a JWT for an end user (workspace user or customer user).
+
+        Supported authentication modes:
+        - `Authorization: Bearer <m2m_token>` — preferred. The token must be a
+          Fluid-signed M2M JWT with `scope` including `fluid:api`.
+          Canonical first-access provisioning via external lookup/create is only
+          available in this mode.
+        - HTTP Basic Auth with `client_id` + `client_secret`.
+          In this mode the service does not perform canonical lookup/create.
+
+        If `customer_external_id` is present, the JWT is issued with `scope: customer`.
+        Otherwise it is issued with `scope: workspace`.
+
+        When canonical first-access provisioning is enabled, `email` is required
+        so the service can lookup or create the canonical user before issuing the token.
+
+        When canonical provisioning is disabled by server configuration, the
+        service may materialize local IAM context by assuming `external_id` is
+        already the canonical `user_id`.
+      operationId: issueUserToken
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserTokenRequest"
+      responses:
+        "200":
+          description: User token issued
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OKResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/UserTokenData"
+              example:
+                ok: true
+                data:
+                  access_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+                  token_type: "Bearer"
+                  expires_in: 3600
+        "400":
+          description: Invalid JSON body, missing `external_id`, or missing `email` when canonical first-access provisioning is needed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                external_id_required:
+                  value:
+                    ok: false
+                    error:
+                      code: invalid_request
+                      message: external_id is required
+                email_required:
+                  value:
+                    ok: false
+                    error:
+                      code: invalid_request
+                      message: email is required for first access provisioning
+        "401":
+          description: Invalid client credentials or invalid bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Bearer token authenticated but missing required M2M scope
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                insufficient_scope:
+                  value:
+                    ok: false
+                    error:
+                      code: insufficient_scope
+                      message: token missing required scope
+        "404":
+          description: Workspace user not found or inactive for the tenant, and no first-access materialization path was available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: workspace_user_not_found
+                  message: workspace user not found or inactive for tenant
+        "409":
+          description: Canonical user lookup returned multiple exact matches
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: user_lookup_ambiguous
+                  message: user lookup returned multiple exact matches
+        "502":
+          $ref: "#/components/responses/BadGateway"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: UP
+
+    OKResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          description: Success payload
+
+    ErrorResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+            message:
+              type: string
+              description: Human-readable description
+
+    IssueTokenRequest:
+      type: object
+      required: [grant_type, client_id, client_secret]
+      properties:
+        grant_type:
+          type: string
+          enum: [client_credentials]
+          example: client_credentials
+        client_id:
+          type: string
+          example: fld-cred-acme-corp--api--postman-primary
+        client_secret:
+          type: string
+          example: "dGhpcyBpcyBhIHNlY3JldA"
+        scope:
+          type: string
+          description: |
+            Space-separated list of scopes to request. Must be a subset of the
+            scopes configured for the tenant. Omit to request all available scopes.
+          example: "fluid:api"
+
+    TokenData:
+      type: object
+      required: [access_token, token_type, expires_in, scope]
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        token_type:
+          type: string
+          enum: [bearer]
+          example: bearer
+        expires_in:
+          type: integer
+          description: Token lifetime in seconds
+          example: 3600
+        scope:
+          type: string
+          description: Space-separated list of granted scopes
+          example: "fluid:api"
+
+    UserTokenRequest:
+      type: object
+      required: [external_id]
+      properties:
+        external_id:
+          type: string
+          example: user-123
+        customer_external_id:
+          type: string
+          example: loja-a
+        email:
+          type: string
+          format: email
+          example: alice@acme.com
+        given_name:
+          type: string
+          example: Alice
+        family_name:
+          type: string
+          example: Smith
+        expires_in:
+          type: integer
+          description: Optional token lifetime in seconds.
+          example: 3600
+
+    UserTokenData:
+      type: object
+      required: [access_token, token_type]
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+
+    JWKSet:
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+            required: [kty, kid, use, alg, n, e]
+            properties:
+              kty:
+                type: string
+                example: RSA
+              kid:
+                type: string
+                example: fld-iam-rs256-2026-03
+              use:
+                type: string
+                example: sig
+              alg:
+                type: string
+                example: RS256
+              n:
+                type: string
+              e:
+                type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            invalid_tenant_id:
+              summary: Invalid tenant_id format
+              value:
+                ok: false
+                error:
+                  code: invalid_tenant_id
+                  message: "tenant_id must match ^[a-z0-9][a-z0-9-]{2,32}$"
+            invalid_scope:
+              summary: Scope not allowed for this tenant
+              value:
+                ok: false
+                error:
+                  code: invalid_scope
+                  message: "scope \"admin\" is not allowed"
+            unsupported_grant_type:
+              summary: Grant type not supported
+              value:
+                ok: false
+                error:
+                  code: unsupported_grant_type
+                  message: only client_credentials grant type is supported
+            invalid_request:
+              summary: Missing required fields
+              value:
+                ok: false
+                error:
+                  code: invalid_request
+                  message: client_id and client_secret are required
+
+    BadGateway:
+      description: Upstream dependency unavailable or token processing failed unexpectedly
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            error:
+              code: token_error
+              message: failed to process token request
