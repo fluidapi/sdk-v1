@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ErrorT } from "openapi/models";
+import { ErrorT } from "fluidapi/models";
 
 let value: ErrorT = {
   code: "<value>",

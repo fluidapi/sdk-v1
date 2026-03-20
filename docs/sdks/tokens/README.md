@@ -33,14 +33,14 @@ tenant's allowlist returns `400 invalid_scope`.
 
 <!-- UsageSnippet language="typescript" operationID="issueM2MToken" method="post" path="/oauth2/token" example="invalid_request" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issue({
+  const result = await fluidapi.tokens.issue({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -58,17 +58,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssue } from "openapi/funcs/tokens-issue.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssue(sdk, {
+  const res = await tokensIssue(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -88,14 +88,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueM2MToken" method="post" path="/oauth2/token" example="invalid_scope" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issue({
+  const result = await fluidapi.tokens.issue({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -113,17 +113,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssue } from "openapi/funcs/tokens-issue.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssue(sdk, {
+  const res = await tokensIssue(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -143,14 +143,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueM2MToken" method="post" path="/oauth2/token" example="unsupported_grant_type" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issue({
+  const result = await fluidapi.tokens.issue({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -168,17 +168,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssue } from "openapi/funcs/tokens-issue.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssue(sdk, {
+  const res = await tokensIssue(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -231,14 +231,14 @@ a JWT signed by Fluid carrying `workspace_id`, `tenant_id`, `client_id`, and
 
 <!-- UsageSnippet language="typescript" operationID="issueFluidTokenLegacy" method="post" path="/oauth2/token-fluid-legacy" example="invalid_request" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issueFluidTokenLegacy({
+  const result = await fluidapi.tokens.issueFluidTokenLegacy({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -256,17 +256,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueFluidTokenLegacy } from "openapi/funcs/tokens-issue-fluid-token-legacy.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-token-legacy.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssueFluidTokenLegacy(sdk, {
+  const res = await tokensIssueFluidTokenLegacy(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -286,14 +286,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueFluidTokenLegacy" method="post" path="/oauth2/token-fluid-legacy" example="invalid_scope" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issueFluidTokenLegacy({
+  const result = await fluidapi.tokens.issueFluidTokenLegacy({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -311,17 +311,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueFluidTokenLegacy } from "openapi/funcs/tokens-issue-fluid-token-legacy.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-token-legacy.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssueFluidTokenLegacy(sdk, {
+  const res = await tokensIssueFluidTokenLegacy(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -341,14 +341,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueFluidTokenLegacy" method="post" path="/oauth2/token-fluid-legacy" example="unsupported_grant_type" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.tokens.issueFluidTokenLegacy({
+  const result = await fluidapi.tokens.issueFluidTokenLegacy({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -366,17 +366,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueFluidTokenLegacy } from "openapi/funcs/tokens-issue-fluid-token-legacy.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-token-legacy.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await tokensIssueFluidTokenLegacy(sdk, {
+  const res = await tokensIssueFluidTokenLegacy(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -437,12 +437,12 @@ Otherwise it is issued with `scope: workspace`.
 
 <!-- UsageSnippet language="typescript" operationID="issueUserToken" method="post" path="/users/token" example="email_required" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK();
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await sdk.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUser({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -464,15 +464,15 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueUser } from "openapi/funcs/tokens-issue-user.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore();
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(sdk, {
+  const res = await tokensIssueUser(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -496,12 +496,12 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueUserToken" method="post" path="/users/token" example="external_id_required" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK();
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await sdk.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUser({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -523,15 +523,15 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueUser } from "openapi/funcs/tokens-issue-user.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore();
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(sdk, {
+  const res = await tokensIssueUser(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -555,12 +555,12 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="issueUserToken" method="post" path="/users/token" example="invalid_body" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK();
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await sdk.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUser({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -582,15 +582,15 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { tokensIssueUser } from "openapi/funcs/tokens-issue-user.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore();
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(sdk, {
+  const res = await tokensIssueUser(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Key } from "openapi/models";
+import { Key } from "fluidapi/models";
 
 let value: Key = {
   kty: "RSA",

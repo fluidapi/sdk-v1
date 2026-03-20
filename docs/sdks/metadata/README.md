@@ -17,14 +17,14 @@ Health check
 
 <!-- UsageSnippet language="typescript" operationID="healthCheck" method="get" path="/health" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -37,17 +37,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { metadataHealthCheck } from "openapi/funcs/metadata-health-check.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { metadataHealthCheck } from "fluidapi/funcs/metadata-health-check.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await metadataHealthCheck(sdk);
+  const res = await metadataHealthCheck(fluidapi);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);
@@ -86,14 +86,14 @@ Returns the JWKS used to validate Fluid-signed JWTs.
 
 <!-- UsageSnippet language="typescript" operationID="getJWKS" method="get" path="/.well-known/jwks.json" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.getJwks();
+  const result = await fluidapi.metadata.getJwks();
 
   console.log(result);
 }
@@ -106,17 +106,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { metadataGetJwks } from "openapi/funcs/metadata-get-jwks.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { metadataGetJwks } from "fluidapi/funcs/metadata-get-jwks.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await metadataGetJwks(sdk);
+  const res = await metadataGetJwks(fluidapi);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);

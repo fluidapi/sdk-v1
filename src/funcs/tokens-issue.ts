@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod/v4-mini";
-import { SDKCore } from "../core.js";
+import { FluidapiCore } from "../core.js";
 import { encodeBodyForm } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -47,7 +47,7 @@ import { Result } from "../types/fp.js";
  * > The client secret is handled server-side and must not be sent by browsers.
  */
 export function tokensIssue(
-  client: SDKCore,
+  client: FluidapiCore,
   request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -72,7 +72,7 @@ export function tokensIssue(
 }
 
 async function $do(
-  client: SDKCore,
+  client: FluidapiCore,
   request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): Promise<

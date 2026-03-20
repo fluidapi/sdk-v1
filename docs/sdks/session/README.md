@@ -26,14 +26,14 @@ The resulting `refresh_token` can be renewed via `POST /users/token/refresh`.
 
 <!-- UsageSnippet language="typescript" operationID="exchangeBootstrapToken" method="post" path="/users/token/exchange" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.session.exchangeBootstrapToken({
+  const result = await fluidapi.session.exchangeBootstrapToken({
     token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
   });
 
@@ -48,17 +48,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { sessionExchangeBootstrapToken } from "openapi/funcs/session-exchange-bootstrap-token.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { sessionExchangeBootstrapToken } from "fluidapi/funcs/session-exchange-bootstrap-token.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionExchangeBootstrapToken(sdk, {
+  const res = await sessionExchangeBootstrapToken(fluidapi, {
     token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
   });
   if (res.ok) {
@@ -107,14 +107,14 @@ only the `refresh_token` is required.
 
 <!-- UsageSnippet language="typescript" operationID="refreshUserSession" method="post" path="/users/token/refresh" example="invalid_body" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.session.refreshUserSession({
+  const result = await fluidapi.session.refreshUserSession({
     refreshToken: "ory_rt_...",
   });
 
@@ -129,17 +129,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { sessionRefreshUserSession } from "openapi/funcs/session-refresh-user-session.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-session.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionRefreshUserSession(sdk, {
+  const res = await sessionRefreshUserSession(fluidapi, {
     refreshToken: "ory_rt_...",
   });
   if (res.ok) {
@@ -156,14 +156,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="refreshUserSession" method="post" path="/users/token/refresh" example="invalid_grant" -->
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.session.refreshUserSession({
+  const result = await fluidapi.session.refreshUserSession({
     refreshToken: "ory_rt_...",
   });
 
@@ -178,17 +178,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { SDKCore } from "openapi/core.js";
-import { sessionRefreshUserSession } from "openapi/funcs/session-refresh-user-session.js";
+import { FluidapiCore } from "fluidapi/core.js";
+import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-session.js";
 
-// Use `SDKCore` for best tree-shaking performance.
+// Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const sdk = new SDKCore({
+const fluidapi = new FluidapiCore({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionRefreshUserSession(sdk, {
+  const res = await sessionRefreshUserSession(fluidapi, {
     refreshToken: "ory_rt_...",
   });
   if (res.ok) {

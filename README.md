@@ -62,30 +62,30 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add openapi
+npm add fluidapi
 ```
 
 ### PNPM
 
 ```bash
-pnpm add openapi
+pnpm add fluidapi
 ```
 
 ### Bun
 
 ```bash
-bun add openapi
+bun add fluidapi
 ```
 
 ### Yarn
 
 ```bash
-yarn add openapi
+yarn add fluidapi
 ```
 
 > [!NOTE]
 > This package is published as an ES Module (ESM) only. For applications using
-> CommonJS, use `await import("openapi")` to import and use this package.
+> CommonJS, use `await import("fluidapi")` to import and use this package.
 <!-- End SDK Installation [installation] -->
 
 <!-- Start Requirements [requirements] -->
@@ -100,14 +100,14 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ### Example
 
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -130,14 +130,14 @@ This SDK supports the following security scheme globally:
 
 To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -150,12 +150,12 @@ run();
 
 Some operations in this SDK require the security scheme to be specified at the request level. For example:
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK();
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await sdk.tokens.issueUser({}, {
+  const result = await fluidapi.tokens.issueUser({}, {
     externalId: "user-123",
     customerExternalId: "loja-a",
     email: "alice@acme.com",
@@ -230,14 +230,14 @@ Some of the endpoints in this SDK support retries.  If you use the SDK without a
 
 To change the default retry strategy for a single API call, simply provide a retryConfig object to the call:
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck({
+  const result = await fluidapi.metadata.healthCheck({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -259,9 +259,9 @@ run();
 
 If you'd like to override the default retry strategy for all operations that support retries, you can provide a retryConfig at SDK initialization:
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   retryConfig: {
     strategy: "backoff",
     backoff: {
@@ -276,7 +276,7 @@ const sdk = new SDK({
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -302,16 +302,16 @@ run();
 
 ### Example
 ```typescript
-import { SDK } from "openapi";
-import * as errors from "openapi/models/errors";
+import { Fluidapi } from "fluidapi";
+import * as errors from "fluidapi/models/errors";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
   try {
-    const result = await sdk.metadata.healthCheck();
+    const result = await fluidapi.metadata.healthCheck();
 
     console.log(result);
   } catch (error) {
@@ -376,9 +376,9 @@ The default server `{scheme}://{host}` contains variables and is set to `https:/
 #### Example
 
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   serverIdx: 0,
   scheme: "https",
   host: "localhost:9999",
@@ -386,7 +386,7 @@ const sdk = new SDK({
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -399,15 +399,15 @@ run();
 
 The default server can be overridden globally by passing a URL to the `serverURL: string` optional parameter when initializing the SDK client instance. For example:
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   serverURL: "https://id.dev.api.fluidapi.io",
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }
@@ -436,9 +436,9 @@ The following example shows how to:
 - use the `"requestError"` hook to log errors
 
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 import { ProxyAgent } from "undici";
-import { HTTPClient } from "openapi/lib/http";
+import { HTTPClient } from "fluidapi/lib/http";
 
 const dispatcher = new ProxyAgent("http://proxy.example.com:8080");
 
@@ -466,7 +466,7 @@ httpClient.addHook("requestError", (error, request) => {
   console.groupEnd();
 });
 
-const sdk = new SDK({ httpClient: httpClient });
+const sdk = new Fluidapi({ httpClient: httpClient });
 ```
 <!-- End Custom HTTP Client [http-client] -->
 
@@ -481,9 +481,9 @@ You can pass a logger that matches `console`'s interface as an SDK option.
 > Beware that debug logging will reveal secrets, like API tokens in headers, in log messages printed to a console or files. It's recommended to use this feature only during local development and not in production.
 
 ```typescript
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({ debugLogger: console });
+const sdk = new Fluidapi({ debugLogger: console });
 ```
 <!-- End Debugging [debug] -->
 

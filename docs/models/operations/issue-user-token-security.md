@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { IssueUserTokenSecurity } from "openapi/models/operations";
+import { IssueUserTokenSecurity } from "fluidapi/models/operations";
 
 let value: IssueUserTokenSecurity = {
   basicAuth: {

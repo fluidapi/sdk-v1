@@ -1,6 +1,9 @@
 configVersion: 2.0.0
 generation:
-  sdkClassName: SDK
+  devContainers:
+    enabled: true
+    schemaPath: .speakeasy/out.openapi.yaml
+  sdkClassName: fluidapi
   maintainOpenAPIOrder: true
   usageSnippets:
     optionalPropertyRendering: withExample
@@ -31,7 +34,7 @@ generation:
     generateNewTests: true
     skipResponseBodyAssertions: false
 typescript:
-  version: 1.0.1
+  version: 0.3.0
   acceptHeaderEnum: false
   additionalDependencies:
     dependencies: {}
@@ -40,7 +43,7 @@ typescript:
   additionalPackageJSON: {}
   additionalScripts: {}
   alwaysIncludeInboundAndOutbound: false
-  author: Speakeasy
+  author: Denis
   baseErrorName: SDKError
   clientServerStatusCodesAsErrors: true
   constFieldsAlwaysOptional: false
@@ -76,7 +79,7 @@ typescript:
   moduleFormat: esm
   multipartArrayFormat: standard
   outputModelSuffix: output
-  packageName: openapi
+  packageName: fluidapi
   preApplyUnionDiscriminators: true
   preserveModelFieldNames: false
   responseFormat: flat

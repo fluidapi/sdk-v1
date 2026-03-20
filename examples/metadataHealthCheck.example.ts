@@ -5,20 +5,20 @@
 import dotenv from "dotenv";
 dotenv.config();
 /**
- * Example usage of the openapi SDK
+ * Example usage of the fluidapi SDK
  *
  * To run this example from the examples directory:
  * npm run build && npx tsx metadataHealthCheck.example.ts
  */
 
-import { SDK } from "openapi";
+import { Fluidapi } from "fluidapi";
 
-const sdk = new SDK({
+const fluidapi = new Fluidapi({
   bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function main() {
-  const result = await sdk.metadata.healthCheck();
+  const result = await fluidapi.metadata.healthCheck();
 
   console.log(result);
 }

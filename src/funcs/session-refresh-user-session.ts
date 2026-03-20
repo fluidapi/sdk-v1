@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod/v4-mini";
-import { SDKCore } from "../core.js";
+import { FluidapiCore } from "../core.js";
 import { encodeJSON } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -38,7 +38,7 @@ import { Result } from "../types/fp.js";
  * only the `refresh_token` is required.
  */
 export function sessionRefreshUserSession(
-  client: SDKCore,
+  client: FluidapiCore,
   request: models.RefreshRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -63,7 +63,7 @@ export function sessionRefreshUserSession(
 }
 
 async function $do(
-  client: SDKCore,
+  client: FluidapiCore,
   request: models.RefreshRequest,
   options?: RequestOptions,
 ): Promise<

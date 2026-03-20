@@ -1,7 +1,7 @@
 {
-  "name": "openapi",
-  "version": "1.0.1",
-  "author": "Speakeasy",
+  "name": "fluidapi",
+  "version": "0.3.0",
+  "author": "Denis",
   "type": "module",
   "main": "./esm/index.js",
   "exports": {

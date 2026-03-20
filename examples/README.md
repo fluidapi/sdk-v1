@@ -1,6 +1,6 @@
-# openapi Examples
+# fluidapi Examples
 
-This directory contains example scripts demonstrating how to use the openapi SDK.
+This directory contains example scripts demonstrating how to use the fluidapi SDK.
 
 ## Prerequisites
 

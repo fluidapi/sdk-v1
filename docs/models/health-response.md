@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { HealthResponse } from "openapi/models";
+import { HealthResponse } from "fluidapi/models";
 
 let value: HealthResponse = {
   status: "UP",
