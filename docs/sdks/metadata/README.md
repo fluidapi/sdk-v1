@@ -7,7 +7,7 @@ Public — Metadata and health endpoints
 ### Available Operations
 
 * [healthCheck](#healthcheck) - Health check
-* [getJwks](#getjwks) - Get public signing keys
+* [getJWKS](#getjwks) - Get public signing keys
 
 ## healthCheck
 
@@ -19,9 +19,7 @@ Health check
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck();
@@ -42,9 +40,7 @@ import { metadataHealthCheck } from "fluidapi/funcs/metadata-health-check.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await metadataHealthCheck(fluidapi);
@@ -78,7 +74,7 @@ run();
 | errors.ErrorResponse   | 503                    | application/json       |
 | errors.SDKDefaultError | 4XX, 5XX               | \*/\*                  |
 
-## getJwks
+## getJWKS
 
 Returns the JWKS used to validate Fluid-signed JWTs.
 
@@ -88,12 +84,10 @@ Returns the JWKS used to validate Fluid-signed JWTs.
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.metadata.getJwks();
+  const result = await fluidapi.metadata.getJWKS();
 
   console.log(result);
 }
@@ -107,21 +101,19 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { metadataGetJwks } from "fluidapi/funcs/metadata-get-jwks.js";
+import { metadataGetJWKS } from "fluidapi/funcs/metadata-get-jwks.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await metadataGetJwks(fluidapi);
+  const res = await metadataGetJWKS(fluidapi);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("metadataGetJwks failed:", res.error);
+    console.log("metadataGetJWKS failed:", res.error);
   }
 }
 

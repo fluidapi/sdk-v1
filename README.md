@@ -13,7 +13,7 @@ Developer-friendly & type-safe Typescript SDK specifically catered to leverage *
 <!-- Start Summary [summary] -->
 ## Summary
 
-Fluid Token API — Public: Public contract for token issuance and token-related public endpoints.
+Fluid Flowkit API — Public: Public contract for token issuance and token-related public endpoints.
 
 ## Authentication
 
@@ -29,6 +29,10 @@ Fluid Token API — Public: Public contract for token issuance and token-related
 | Scope | Description |
 |---|---|
 | `fluid:api` | Full access to the Fluid API |
+Initial public contract for the client SDK bootstrap.
+
+This first version documents the Flowkit activation operation based on the
+provided cURL request and successful `201 Created` response.
 <!-- End Summary [summary] -->
 
 <!-- Start Table of Contents [toc] -->
@@ -102,9 +106,7 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck();
@@ -155,7 +157,7 @@ import { Fluidapi } from "fluidapi";
 const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issueUser({}, {
+  const result = await fluidapi.tokens.issueUserToken({}, {
     externalId: "user-123",
     customerExternalId: "loja-a",
     email: "alice@acme.com",
@@ -178,10 +180,16 @@ run();
 <details open>
 <summary>Available methods</summary>
 
+### [Flowkits](docs/sdks/flowkits/README.md)
+
+* [activateFlowkit](docs/sdks/flowkits/README.md#activateflowkit) - Activate Flowkit
+* [listFlowkitActivations](docs/sdks/flowkits/README.md#listflowkitactivations) - List active Flowkits
+* [deleteFlowkitActivation](docs/sdks/flowkits/README.md#deleteflowkitactivation) - Delete Flowkit activation
+
 ### [Metadata](docs/sdks/metadata/README.md)
 
 * [healthCheck](docs/sdks/metadata/README.md#healthcheck) - Health check
-* [getJwks](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
+* [getJWKS](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
 
 ### [Session](docs/sdks/session/README.md)
 
@@ -190,9 +198,9 @@ run();
 
 ### [Tokens](docs/sdks/tokens/README.md)
 
-* [issue](docs/sdks/tokens/README.md#issue) - Issue M2M token (client_credentials)
+* [issueM2MToken](docs/sdks/tokens/README.md#issuem2mtoken) - Issue M2M token (client_credentials)
 * [~~issueFluidTokenLegacy~~](docs/sdks/tokens/README.md#issuefluidtokenlegacy) - Issue Fluid-signed M2M token (legacy) :warning: **Deprecated**
-* [issueUser](docs/sdks/tokens/README.md#issueuser) - Issue bootstrap token for end user
+* [issueUserToken](docs/sdks/tokens/README.md#issueusertoken) - Issue bootstrap token for end user
 
 </details>
 <!-- End Available Resources and Operations [operations] -->
@@ -212,12 +220,15 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [`metadataGetJwks`](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
+- [`flowkitsActivateFlowkit`](docs/sdks/flowkits/README.md#activateflowkit) - Activate Flowkit
+- [`flowkitsDeleteFlowkitActivation`](docs/sdks/flowkits/README.md#deleteflowkitactivation) - Delete Flowkit activation
+- [`flowkitsListFlowkitActivations`](docs/sdks/flowkits/README.md#listflowkitactivations) - List active Flowkits
+- [`metadataGetJWKS`](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
 - [`metadataHealthCheck`](docs/sdks/metadata/README.md#healthcheck) - Health check
 - [`sessionExchangeBootstrapToken`](docs/sdks/session/README.md#exchangebootstraptoken) - Exchange bootstrap token for user session
 - [`sessionRefreshUserSession`](docs/sdks/session/README.md#refreshusersession) - Renew user session (refresh token)
-- [`tokensIssue`](docs/sdks/tokens/README.md#issue) - Issue M2M token (client_credentials)
-- [`tokensIssueUser`](docs/sdks/tokens/README.md#issueuser) - Issue bootstrap token for end user
+- [`tokensIssueM2MToken`](docs/sdks/tokens/README.md#issuem2mtoken) - Issue M2M token (client_credentials)
+- [`tokensIssueUserToken`](docs/sdks/tokens/README.md#issueusertoken) - Issue bootstrap token for end user
 - ~~[`tokensIssueFluidTokenLegacy`](docs/sdks/tokens/README.md#issuefluidtokenlegacy)~~ - Issue Fluid-signed M2M token (legacy) :warning: **Deprecated**
 
 </details>
@@ -232,9 +243,7 @@ To change the default retry strategy for a single API call, simply provide a ret
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck({
@@ -272,7 +281,6 @@ const fluidapi = new Fluidapi({
     },
     retryConnectionErrors: false,
   },
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -305,9 +313,7 @@ run();
 import { Fluidapi } from "fluidapi";
 import * as errors from "fluidapi/models/errors";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   try {
@@ -324,8 +330,7 @@ async function run() {
 
       // Depending on the method different errors may be thrown
       if (error instanceof errors.ErrorResponse) {
-        console.log(error.data$.ok); // boolean
-        console.log(error.data$.error); // models.ErrorT
+        console.log(error.data$.message); // string
       }
     }
   }
@@ -352,8 +357,8 @@ run();
 
 
 **Inherit from [`SDKError`](./src/models/errors/sdk-error.ts)**:
-* [`OAuth2ErrorResponse`](./src/models/errors/o-auth2-error-response.ts): Invalid request parameters. Applicable to 5 of 7 methods.*
-* [`ErrorResponse`](./src/models/errors/error-response.ts): Status code `503`. Applicable to 2 of 7 methods.*
+* [`OAuth2ErrorResponse`](./src/models/errors/o-auth2-error-response.ts): Invalid request parameters. Applicable to 5 of 10 methods.*
+* [`ErrorResponse`](./src/models/errors/error-response.ts): Applicable to 5 of 10 methods.*
 * [`ResponseValidationError`](./src/models/errors/response-validation-error.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>
@@ -382,7 +387,6 @@ const fluidapi = new Fluidapi({
   serverIdx: 0,
   scheme: "https",
   host: "localhost:9999",
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -403,7 +407,6 @@ import { Fluidapi } from "fluidapi";
 
 const fluidapi = new Fluidapi({
   serverURL: "https://id.dev.api.fluidapi.io",
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {

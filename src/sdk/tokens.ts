@@ -3,8 +3,8 @@
  */
 
 import { tokensIssueFluidTokenLegacy } from "../funcs/tokens-issue-fluid-token-legacy.js";
-import { tokensIssueUser } from "../funcs/tokens-issue-user.js";
-import { tokensIssue } from "../funcs/tokens-issue.js";
+import { tokensIssueM2MToken } from "../funcs/tokens-issue-m2-m-token.js";
+import { tokensIssueUserToken } from "../funcs/tokens-issue-user-token.js";
 import { ClientSDK, RequestOptions } from "../lib/sdks.js";
 import * as models from "../models/index.js";
 import * as operations from "../models/operations/index.js";
@@ -31,11 +31,11 @@ export class Tokens extends ClientSDK {
    * > **User session refresh:** use `POST /users/token/refresh` instead.
    * > The client secret is handled server-side and must not be sent by browsers.
    */
-  async issue(
+  async issueM2MToken(
     request: models.ClientCredentialsRequest,
     options?: RequestOptions,
   ): Promise<models.TokenData> {
-    return unwrapAsync(tokensIssue(
+    return unwrapAsync(tokensIssueM2MToken(
       this,
       request,
       options,
@@ -85,12 +85,12 @@ export class Tokens extends ClientSDK {
    * If `customer_external_id` is present, the JWT is issued with `scope: customer`.
    * Otherwise it is issued with `scope: workspace`.
    */
-  async issueUser(
+  async issueUserToken(
     security: operations.IssueUserTokenSecurity,
     request: models.UserTokenRequest,
     options?: RequestOptions,
   ): Promise<models.UserTokenData> {
-    return unwrapAsync(tokensIssueUser(
+    return unwrapAsync(tokensIssueUserToken(
       this,
       security,
       request,

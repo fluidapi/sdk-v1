@@ -4,18 +4,13 @@
 
 import * as z from "zod/v4-mini";
 import * as types from "../../types/primitives.js";
-import * as models from "../index.js";
 import { SDKError } from "./sdk-error.js";
 
 export type ErrorResponseData = {
-  ok: boolean;
-  error: models.ErrorT;
+  message: string;
 };
 
 export class ErrorResponse extends SDKError {
-  ok: boolean;
-  error: models.ErrorT;
-
   /** The original data that was passed to this error instance. */
   data$: ErrorResponseData;
 
@@ -23,12 +18,9 @@ export class ErrorResponse extends SDKError {
     err: ErrorResponseData,
     httpMeta: { response: Response; request: Request; body: string },
   ) {
-    const message = err.error?.message
-      || `API error occurred: ${JSON.stringify(err)}`;
+    const message = err.message || `API error occurred: ${JSON.stringify(err)}`;
     super(message, httpMeta);
     this.data$ = err;
-    this.ok = err.ok;
-    this.error = err.error;
 
     this.name = "ErrorResponse";
   }
@@ -40,8 +32,7 @@ export const ErrorResponse$inboundSchema: z.ZodMiniType<
   unknown
 > = z.pipe(
   z.object({
-    ok: types.boolean(),
-    error: z.lazy(() => models.ErrorT$inboundSchema),
+    message: types.string(),
     request$: z.custom<Request>(x => x instanceof Request),
     response$: z.custom<Response>(x => x instanceof Response),
     body$: z.string(),

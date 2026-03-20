@@ -28,9 +28,7 @@ The resulting `refresh_token` can be renewed via `POST /users/token/refresh`.
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.session.exchangeBootstrapToken({
@@ -53,9 +51,7 @@ import { sessionExchangeBootstrapToken } from "fluidapi/funcs/session-exchange-b
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await sessionExchangeBootstrapToken(fluidapi, {
@@ -109,9 +105,7 @@ only the `refresh_token` is required.
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.session.refreshUserSession({
@@ -134,9 +128,7 @@ import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-s
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await sessionRefreshUserSession(fluidapi, {
@@ -158,9 +150,7 @@ run();
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.session.refreshUserSession({
@@ -183,9 +173,7 @@ import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-s
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await sessionRefreshUserSession(fluidapi, {

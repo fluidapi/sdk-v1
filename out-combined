@@ -1,0 +1,1527 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fluid Flowkit API — Public",
+    "description": "Public contract for token issuance and token-related public endpoints.\n\n## Authentication\n\n- **`/oauth2/token`** — public endpoint; supports `client_credentials` (M2M only).\n- **`/oauth2/token-fluid-legacy`** — legacy Fluid-signed M2M JWT endpoint (deprecated, prefer `/oauth2/token`).\n- **`/users/token`** — public endpoint for end-user bootstrap token issuance. Supports Bearer M2M or HTTP Basic Auth.\n- **`/users/token/exchange`** — exchanges a short-lived bootstrap token for a Hydra-managed session (access_token + refresh_token).\n- **`/users/token/refresh`** — renews a user session using a Hydra refresh token. The client secret is handled server-side and must not be exposed to browsers.\n- **`/.well-known/jwks.json`** — public key discovery for Fluid-signed JWT validation.\n\n## Scopes\n\n| Scope | Description |\n|---|---|\n| `fluid:api` | Full access to the Fluid API |\nInitial public contract for the client SDK bootstrap.\n\nThis first version documents the Flowkit activation operation based on the\nprovided cURL request and successful `201 Created` response.",
+    "version": "0.1.0",
+    "contact": {
+      "name": "Fluid API Team",
+      "email": "api@fluidapi.com"
+    },
+    "license": {
+      "name": "Proprietary",
+      "identifier": "LicenseRef-Proprietary"
+    }
+  },
+  "servers": [
+    {
+      "url": "{scheme}://{host}",
+      "description": "Configurable environment",
+      "variables": {
+        "scheme": {
+          "default": "https",
+          "enum": [
+            "http",
+            "https"
+          ]
+        },
+        "host": {
+          "default": "id.dev.api.fluidapi.io",
+          "enum": [
+            "id.dev.api.fluidapi.io",
+            "id.api.fluidapi.io",
+            "localhost:9999"
+          ]
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "tokens",
+      "description": "Public — Token issuance for tenants"
+    },
+    {
+      "name": "session",
+      "description": "Public — User session lifecycle (exchange + refresh)"
+    },
+    {
+      "name": "metadata",
+      "description": "Public — Metadata and health endpoints"
+    },
+    {
+      "name": "flowkits",
+      "description": "Operations related to Flowkit lifecycle management."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "healthCheck",
+        "tags": ["metadata"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "status": "UP"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health could not be evaluated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "ok": false,
+                  "error": {
+                    "code": "health_check_error",
+                    "message": "failed to evaluate service health"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "summary": "Get public signing keys",
+        "description": "Returns the JWKS used to validate Fluid-signed JWTs.",
+        "operationId": "getJWKS",
+        "tags": ["metadata"],
+        "responses": {
+          "200": {
+            "description": "JWK set returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JWKSet"
+                },
+                "example": {
+                  "keys": [
+                    {
+                      "kty": "RSA",
+                      "kid": "OT9A3u8xcG53oZKbMb7yvr7vb3IkKcJYyjR3ea5pij8",
+                      "use": "sig",
+                      "alg": "RS256",
+                      "n": "1fi9UyLM...",
+                      "e": "AQAB"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "JWKS temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "ok": false,
+                  "error": {
+                    "code": "jwks_error",
+                    "message": "failed to load jwks"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/oauth2/token": {
+      "post": {
+        "summary": "Issue M2M token (client_credentials)",
+        "description": "OAuth2 token endpoint for M2M (machine-to-machine) access.\nOnly `grant_type=client_credentials` is supported.\n\nPerforms a `client_credentials` grant against the Authorization Server and\nreturns a Hydra-issued access token (JWT) following RFC 6749 token response format.\n\nThe OAuth2 client must be registered first via\n`POST /v1/tenants/{tenant_id}/credentials`.\n\nBy default the token is issued with all scopes configured for the tenant.\nYou can request a subset by passing `scope`. Requesting a scope not in the\ntenant's allowlist returns `400 invalid_scope`.\n\n> **User session refresh:** use `POST /users/token/refresh` instead.\n> The client secret is handled server-side and must not be sent by browsers.\n",
+        "operationId": "issueM2MToken",
+        "tags": ["tokens"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientCredentialsRequest"
+              },
+              "example": {
+                "grant_type": "client_credentials",
+                "client_id": "fld-cred-acme-corp--api--postman-primary",
+                "client_secret": "dGhpcyBpcyBhIHNlY3JldA"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "M2M token issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenData"
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "token_type": "bearer",
+                  "expires_in": 3600,
+                  "scope": "fluid:api"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/OAuth2BadRequest"
+          },
+          "401": {
+            "description": "Invalid client credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_client",
+                  "error_description": "invalid client credentials"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/OAuth2BadGateway"
+          }
+        },
+        "security": []
+      }
+    },
+    "/oauth2/token-fluid-legacy": {
+      "post": {
+        "summary": "Issue Fluid-signed M2M token (legacy)",
+        "description": "**Deprecated** — prefer `POST /oauth2/token` with `grant_type=client_credentials`.\n\nValidates client credentials against the Authorization Server and generates\na JWT signed by Fluid carrying `workspace_id`, `tenant_id`, `client_id`, and\n`credential_type` claims.\n",
+        "operationId": "issueFluidTokenLegacy",
+        "deprecated": true,
+        "tags": ["tokens"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientCredentialsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fluid-signed M2M token issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenData"
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
+                  "token_type": "bearer",
+                  "expires_in": 3600,
+                  "scope": "fluid:api"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/OAuth2BadRequest"
+          },
+          "401": {
+            "description": "Invalid client credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_client",
+                  "error_description": "invalid client credentials"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/OAuth2BadGateway"
+          }
+        },
+        "security": []
+      }
+    },
+    "/users/token": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "BasicAuth": []
+          }
+        ],
+        "summary": "Issue bootstrap token for end user",
+        "description": "Issues a short-lived bootstrap JWT for an end user (workspace or customer scope).\n\nThe token lifetime is capped at `BOOTSTRAP_TOKEN_TTL_SECONDS` (default: 300s)\nregardless of the `expires_in` value in the request. This token is single-use\nand is intended to be exchanged immediately via `POST /users/token/exchange`.\n\nSupported authentication modes:\n- `Authorization: Bearer <m2m_token>` — preferred. The token must be a\n  Fluid-signed M2M JWT with `scope` including `fluid:api`.\n  Canonical first-access provisioning is only available in this mode.\n- HTTP Basic Auth with `client_id` + `client_secret`.\n  Provisioning is skipped in this mode.\n\nIf `customer_external_id` is present, the JWT is issued with `scope: customer`.\nOtherwise it is issued with `scope: workspace`.\n",
+        "operationId": "issueUserToken",
+        "tags": ["tokens"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bootstrap token issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserTokenData"
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
+                  "token_type": "bearer",
+                  "expires_in": 300
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request — malformed body, missing `external_id`, or missing `email` when first-access provisioning is needed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "examples": {
+                  "invalid_body": {
+                    "value": {
+                      "error": "invalid_request",
+                      "error_description": "invalid JSON body: ..."
+                    }
+                  },
+                  "external_id_required": {
+                    "value": {
+                      "error": "invalid_request",
+                      "error_description": "external_id is required"
+                    }
+                  },
+                  "email_required": {
+                    "value": {
+                      "error": "invalid_request",
+                      "error_description": "email is required for first access provisioning"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid client credentials or invalid bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_client",
+                  "error_description": "invalid client credentials"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope, provisioning requires Bearer auth, or customer/user is revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "examples": {
+                  "insufficient_scope": {
+                    "value": {
+                      "error": "insufficient_scope",
+                      "error_description": "token missing required scope"
+                    }
+                  },
+                  "customer_revoked": {
+                    "value": {
+                      "error": "customer_revoked",
+                      "error_description": "customer is revoked"
+                    }
+                  },
+                  "customer_user_revoked": {
+                    "value": {
+                      "error": "customer_user_revoked",
+                      "error_description": "customer user is revoked"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace user not found or inactive for the tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "workspace_user_not_found",
+                  "error_description": "workspace user not found or inactive for tenant"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Canonical user lookup returned multiple exact matches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "user_lookup_ambiguous",
+                  "error_description": "user lookup returned multiple exact matches"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/OAuth2BadGateway"
+          }
+        }
+      }
+    },
+    "/users/token/exchange": {
+      "post": {
+        "summary": "Exchange bootstrap token for user session",
+        "description": "Exchanges the short-lived bootstrap JWT issued by `POST /users/token` for a\nHydra-managed session token pair (`access_token` + `refresh_token`).\n\nThe bootstrap token is **single-use**: a second call with the same token\nreturns `401 invalid_grant`. Claims from the bootstrap token (workspace_id,\ntenant_id, user_id, etc.) are forwarded into the Hydra session via the\nserver-side authorization code flow.\n\nThe resulting `refresh_token` can be renewed via `POST /users/token/refresh`.\n",
+        "operationId": "exchangeBootstrapToken",
+        "tags": ["session"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeRequest"
+              },
+              "example": {
+                "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session token pair issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTokenData"
+                },
+                "example": {
+                  "access_token": "ory_at_...",
+                  "refresh_token": "ory_rt_...",
+                  "token_type": "bearer",
+                  "expires_in": 3600
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_request",
+                  "error_description": "invalid JSON body: ..."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, expired, or already-used bootstrap token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "value": {
+                      "error": "invalid_token",
+                      "error_description": "invalid or expired token"
+                    }
+                  },
+                  "already_used": {
+                    "value": {
+                      "error": "invalid_grant",
+                      "error_description": "bootstrap token has already been used"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/OAuth2BadGateway"
+          }
+        },
+        "security": []
+      }
+    },
+    "/users/token/refresh": {
+      "post": {
+        "summary": "Renew user session (refresh token)",
+        "description": "Exchanges a Hydra refresh token for a new session token pair\n(`access_token` + `refresh_token`).\n\nThe `fluid-user-session` client credentials are handled server-side.\nBrowsers and mobile clients must **not** hold or send the client secret —\nonly the `refresh_token` is required.\n",
+        "operationId": "refreshUserSession",
+        "tags": ["session"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              },
+              "example": {
+                "refresh_token": "ory_rt_..."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session renewed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTokenData"
+                },
+                "example": {
+                  "access_token": "ory_at_...",
+                  "refresh_token": "ory_rt_...",
+                  "token_type": "bearer",
+                  "expires_in": 3600
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/malformed request body, or expired/revoked refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "examples": {
+                  "invalid_body": {
+                    "value": {
+                      "error": "invalid_request",
+                      "error_description": "invalid JSON body: ..."
+                    }
+                  },
+                  "invalid_grant": {
+                    "value": {
+                      "error": "invalid_grant",
+                      "error_description": "refresh token is expired or revoked"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid client credentials (server-side misconfiguration)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_client",
+                  "error_description": "invalid client credentials"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/OAuth2BadGateway"
+          }
+        },
+        "security": []
+      }
+    },
+    "/contaazul/v1/flowkits/activations": {
+      "post": {
+        "operationId": "activateFlowkit",
+        "summary": "Activate Flowkit",
+        "description": "Activates a Flowkit for the Conta Azul integration using the provided\nconnector credentials and tenant/user context metadata.\n",
+        "tags": [
+          "flowkits"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "description": "Activation key used to authorize the Flowkit activation.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "dab7e862-5899-4993-b50b-2fe8c4535b8e"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateFlowkitRequest"
+              },
+              "example": {
+                "credentials": {
+                  "url": "https://1225878.commercesuite.com.br",
+                  "code": "504c234370fd5bc6224ad99e154c039fbecbd9d893fajsdoi78y87sdysj9sdd"
+                },
+                "data": {
+                  "identifier": "loja01",
+                  "x-tenantId": "3363001",
+                  "x-userId": "58139234",
+                  "x-email": "1d46cf93-68c7-4106-345s-43f147ecdd67@devportal.com"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Flowkit activation accepted and resource created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlowkitActivation"
+                },
+                "example": {
+                  "audit": {
+                    "created": {
+                      "timestamp": "2026-03-19T19:11:22.841037415-03:00",
+                      "user_id": "bc32c03a-e885-4641-aaac-ca9358703d07"
+                    },
+                    "update_history": [
+                      {
+                        "timestamp": "2026-03-19T19:11:22.841037415-03:00",
+                        "user_id": "bc32c03a-e885-4641-aaac-ca9358703d07"
+                      }
+                    ],
+                    "updated": {
+                      "timestamp": "2026-03-19T19:11:22.841037415-03:00",
+                      "user_id": "bc32c03a-e885-4641-aaac-ca9358703d07"
+                    }
+                  },
+                  "connectors": [
+                    "contaazulprivado",
+                    "tray"
+                  ],
+                  "description": "descricao do flowkit",
+                  "flowkit_name": "conta-azul-tray-2",
+                  "flowkit_revision": "1.0.0",
+                  "id": "9074bd4d-23e0-11f1-b769-4e4d4c5f610c",
+                  "identifier": "loja06",
+                  "published": true,
+                  "status": "in_progress"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listFlowkitActivations",
+        "summary": "List active Flowkits",
+        "description": "Returns the currently activated Flowkits.\n\nThis operation is currently documented with a mock response so the SDK\ncan be generated and consumed by the client team before the final API\ncontract is available.\n",
+        "tags": [
+          "flowkits"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activated Flowkits returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListFlowkitActivationsResponse"
+                },
+                "example": {
+                  "data": {
+                    "data": [
+                      {
+                        "__typename": "FlowKitActivatedResponse",
+                        "activations": 1,
+                        "audit": {
+                          "created": {
+                            "first_name": "Luigi",
+                            "last_name": "da Silva",
+                            "timestamp": "2026-02-27T14:54:41.103Z"
+                          },
+                          "updated": {
+                            "first_name": "Luigi",
+                            "last_name": "da Silva",
+                            "timestamp": "2026-02-27T14:54:41.103Z"
+                          }
+                        },
+                        "connectors": [
+                          "linx-commerce",
+                          "fluid-flow",
+                          "storage",
+                          "http"
+                        ],
+                        "flowkit_name": "bling-linx",
+                        "flowkit_revision": "1.0.7",
+                        "flows": 4,
+                        "id": "bling-linx-1.0.7",
+                        "identifier": "flowkit-test-test",
+                        "status": "success"
+                      },
+                      {
+                        "__typename": "FlowKitActivatedResponse",
+                        "activations": 1,
+                        "audit": {
+                          "created": {
+                            "first_name": "Luigi",
+                            "last_name": "da Silva",
+                            "timestamp": "2026-02-27T14:52:36.553Z"
+                          },
+                          "updated": {
+                            "first_name": "Luigi",
+                            "last_name": "da Silva",
+                            "timestamp": "2026-02-27T14:52:36.553Z"
+                          }
+                        },
+                        "connectors": [
+                          "flexy",
+                          "bling"
+                        ],
+                        "flowkit_name": "bling-flexy",
+                        "flowkit_revision": "1.0.0",
+                        "flows": 2,
+                        "id": "bling-flexy-1.0.0",
+                        "identifier": "flowkit-test-ativaca",
+                        "status": "success"
+                      }
+                    ],
+                    "total": {
+                      "__typename": "Meta",
+                      "count": 13
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/contaazul/v1/flowkits/activations/{activationId}": {
+      "delete": {
+        "operationId": "deleteFlowkitActivation",
+        "summary": "Delete Flowkit activation",
+        "description": "Deletes an activated Flowkit by its activation identifier.\n\nThis operation is currently scaffolded for SDK generation and uses a\nmock success response.\n",
+        "tags": [
+          "flowkits"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "activationId",
+            "in": "path",
+            "description": "Identifier of the activated Flowkit to delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "bling-linx-1.0.7"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flowkit activation deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFlowkitActivationResponse"
+                },
+                "example": {
+                  "data": {
+                    "deleted": true,
+                    "id": "bling-linx-1.0.7"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "UP"
+          }
+        }
+      },
+      "OKResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "description": "Success payload"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "unexpected error"
+          }
+        }
+      },
+      "ClientCredentialsRequest": {
+        "type": "object",
+        "required": ["grant_type", "client_id", "client_secret"],
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": ["client_credentials"],
+            "example": "client_credentials"
+          },
+          "client_id": {
+            "type": "string",
+            "example": "fld-cred-acme-corp--api--postman-primary"
+          },
+          "client_secret": {
+            "type": "string",
+            "example": "dGhpcyBpcyBhIHNlY3JldA"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-separated list of scopes to request. Must be a subset of the\nscopes configured for the tenant. Omit to request all available scopes.\n",
+            "example": "fluid:api"
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "required": ["refresh_token"],
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Hydra refresh token obtained from `/users/token/exchange` or a prior `/users/token/refresh`",
+            "example": "ory_rt_..."
+          }
+        }
+      },
+      "ExchangeRequest": {
+        "type": "object",
+        "required": ["token"],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Bootstrap JWT issued by `POST /users/token`",
+            "example": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+          }
+        }
+      },
+      "OAuth2ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "OAuth2 error code (RFC 6749)",
+            "example": "invalid_client"
+          },
+          "error_description": {
+            "type": "string",
+            "description": "Human-readable error description",
+            "example": "invalid client credentials"
+          }
+        }
+      },
+      "TokenData": {
+        "type": "object",
+        "required": ["access_token", "token_type", "expires_in"],
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": ["Bearer", "bearer"],
+            "example": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Token lifetime in seconds",
+            "example": 3600
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-separated list of granted scopes",
+            "example": "fluid:api"
+          }
+        }
+      },
+      "SessionTokenData": {
+        "type": "object",
+        "required": ["access_token", "token_type", "expires_in"],
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Hydra-issued access token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Hydra refresh token; use with `POST /users/token/refresh`"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": ["bearer"],
+            "example": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Access token lifetime in seconds",
+            "example": 3600
+          }
+        }
+      },
+      "UserTokenRequest": {
+        "type": "object",
+        "required": ["external_id"],
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "example": "user-123"
+          },
+          "customer_external_id": {
+            "type": "string",
+            "example": "loja-a"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alice@acme.com"
+          },
+          "given_name": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "family_name": {
+            "type": "string",
+            "example": "Smith"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Requested token lifetime in seconds. Capped at `BOOTSTRAP_TOKEN_TTL_SECONDS`\n(default: 300s). Values equal to or above the cap use the cap.\n",
+            "example": 300
+          }
+        }
+      },
+      "UserTokenData": {
+        "type": "object",
+        "required": ["access_token", "token_type", "expires_in"],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": ["Bearer", "bearer"],
+            "example": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Effective token lifetime in seconds (always set; capped at server config)",
+            "example": 300
+          }
+        }
+      },
+      "JWKSet": {
+        "type": "object",
+        "required": ["keys"],
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kty", "kid", "use", "alg", "n", "e"],
+              "properties": {
+                "kty": {
+                  "type": "string",
+                  "example": "RSA"
+                },
+                "kid": {
+                  "type": "string",
+                  "example": "fld-iam-rs256-2026-03"
+                },
+                "use": {
+                  "type": "string",
+                  "example": "sig"
+                },
+                "alg": {
+                  "type": "string",
+                  "example": "RS256"
+                },
+                "n": {
+                  "type": "string"
+                },
+                "e": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ActivateFlowkitRequest": {
+        "type": "object",
+        "properties": {
+          "credentials": {
+            "$ref": "#/components/schemas/FlowkitCredentials"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FlowkitActivationContext"
+          }
+        },
+        "required": [
+          "credentials",
+          "data"
+        ]
+      },
+      "FlowkitCredentials": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Base URL for the connected commerce platform.",
+            "example": "https://1225878.commercesuite.com.br"
+          },
+          "code": {
+            "type": "string",
+            "description": "Integration credential code/token.",
+            "example": "504c234370fd5bc6224ad99e154c039fbecbd9d893fajsdoi78y87sdysj9sdd"
+          }
+        },
+        "required": [
+          "url",
+          "code"
+        ]
+      },
+      "FlowkitActivationContext": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Client-side identifier for the activated Flowkit.",
+            "example": "loja01"
+          },
+          "x-tenantId": {
+            "type": "string",
+            "description": "Tenant identifier propagated to the integration context.",
+            "example": "3363001"
+          },
+          "x-userId": {
+            "type": "string",
+            "description": "User identifier propagated to the integration context.",
+            "example": "58139234"
+          },
+          "x-email": {
+            "type": "string",
+            "format": "email",
+            "description": "User email propagated to the integration context.",
+            "example": "cliente@devportal.com"
+          }
+        },
+        "required": [
+          "identifier",
+          "x-tenantId",
+          "x-userId",
+          "x-email"
+        ]
+      },
+      "FlowkitActivation": {
+        "type": "object",
+        "properties": {
+          "audit": {
+            "$ref": "#/components/schemas/AuditMetadata"
+          },
+          "connectors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "contaazulprivado",
+              "tray"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "descricao do flowkit"
+          },
+          "flowkit_name": {
+            "type": "string",
+            "example": "conta-azul-tray-2"
+          },
+          "flowkit_revision": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "9074bd4d-23e0-11f1-b769-4e4d4c5f610c"
+          },
+          "identifier": {
+            "type": "string",
+            "example": "loja06"
+          },
+          "published": {
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "type": "string",
+            "example": "in_progress"
+          }
+        },
+        "required": [
+          "audit",
+          "connectors",
+          "description",
+          "flowkit_name",
+          "flowkit_revision",
+          "id",
+          "identifier",
+          "published",
+          "status"
+        ]
+      },
+      "AuditMetadata": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "$ref": "#/components/schemas/AuditEntry"
+          },
+          "update_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditEntry"
+            }
+          },
+          "updated": {
+            "$ref": "#/components/schemas/AuditEntry"
+          }
+        },
+        "required": [
+          "created",
+          "update_history",
+          "updated"
+        ]
+      },
+      "AuditEntry": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-19T19:11:22.841037415-03:00"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "bc32c03a-e885-4641-aaac-ca9358703d07"
+          }
+        },
+        "required": [
+          "timestamp",
+          "user_id"
+        ]
+      },
+      "ListFlowkitActivationsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FlowkitActivationListEnvelope"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "FlowkitActivationListEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowkitActivatedItem"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/MetaCount"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "FlowkitActivatedItem": {
+        "type": "object",
+        "properties": {
+          "__typename": {
+            "type": "string",
+            "example": "FlowKitActivatedResponse"
+          },
+          "activations": {
+            "type": "integer",
+            "example": 1
+          },
+          "audit": {
+            "$ref": "#/components/schemas/FlowkitUserAudit"
+          },
+          "connectors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "flowkit_name": {
+            "type": "string",
+            "example": "bling-linx"
+          },
+          "flowkit_revision": {
+            "type": "string",
+            "example": "1.0.7"
+          },
+          "flows": {
+            "type": "integer",
+            "example": 4
+          },
+          "id": {
+            "type": "string",
+            "example": "bling-linx-1.0.7"
+          },
+          "identifier": {
+            "type": "string",
+            "example": "flowkit-test-test"
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          }
+        },
+        "required": [
+          "__typename",
+          "activations",
+          "audit",
+          "connectors",
+          "flowkit_name",
+          "flowkit_revision",
+          "flows",
+          "id",
+          "identifier",
+          "status"
+        ]
+      },
+      "FlowkitUserAudit": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "$ref": "#/components/schemas/FlowkitUserAuditEntry"
+          },
+          "updated": {
+            "$ref": "#/components/schemas/FlowkitUserAuditEntry"
+          }
+        },
+        "required": [
+          "created",
+          "updated"
+        ]
+      },
+      "FlowkitUserAuditEntry": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "example": "Luigi"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "da Silva"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-02-27T14:54:41.103Z"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "timestamp"
+        ]
+      },
+      "MetaCount": {
+        "type": "object",
+        "properties": {
+          "__typename": {
+            "type": "string",
+            "example": "Meta"
+          },
+          "count": {
+            "type": "integer",
+            "example": 13
+          }
+        },
+        "required": [
+          "__typename",
+          "count"
+        ]
+      },
+      "DeleteFlowkitActivationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "deleted": {
+                "type": "boolean",
+                "example": true
+              },
+              "id": {
+                "type": "string",
+                "example": "bling-linx-1.0.7"
+              }
+            },
+            "required": [
+              "deleted",
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      }
+    },
+    "responses": {
+      "OAuth2BadRequest": {
+        "description": "Invalid request parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OAuth2ErrorResponse"
+            },
+            "examples": {
+              "invalid_scope": {
+                "summary": "Scope not allowed for this tenant",
+                "value": {
+                  "error": "invalid_scope",
+                  "error_description": "scope \"admin\" is not allowed"
+                }
+              },
+              "unsupported_grant_type": {
+                "summary": "Grant type not supported",
+                "value": {
+                  "error": "unsupported_grant_type",
+                  "error_description": "supported grant type: client_credentials"
+                }
+              },
+              "invalid_request": {
+                "summary": "Missing required fields",
+                "value": {
+                  "error": "invalid_request",
+                  "error_description": "client_id and client_secret are required"
+                }
+              }
+            }
+          }
+        }
+      },
+      "OAuth2BadGateway": {
+        "description": "Upstream dependency unavailable or token processing failed unexpectedly",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OAuth2ErrorResponse"
+            },
+            "examples": {
+              "token_error": {
+                "value": {
+                  "error": "token_error",
+                  "error_description": "failed to process token request"
+                }
+              },
+              "user_provisioning_failed": {
+                "value": {
+                  "error": "user_provisioning_failed",
+                  "error_description": "failed to provision canonical user"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Invalid request payload or query parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "message": "invalid request"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid bearer token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "message": "unauthorized"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Unexpected server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "message": "internal server error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Requested resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "message": "flowkit activation not found"
+            }
+          }
+        }
+      }
+    }
+  }
+}

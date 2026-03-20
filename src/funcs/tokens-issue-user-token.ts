@@ -47,7 +47,7 @@ import { Result } from "../types/fp.js";
  * If `customer_external_id` is present, the JWT is issued with `scope: customer`.
  * Otherwise it is issued with `scope: workspace`.
  */
-export function tokensIssueUser(
+export function tokensIssueUserToken(
   client: FluidapiCore,
   security: operations.IssueUserTokenSecurity,
   request: models.UserTokenRequest,

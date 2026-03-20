@@ -2,9 +2,7 @@
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck();

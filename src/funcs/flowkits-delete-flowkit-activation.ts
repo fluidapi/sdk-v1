@@ -4,7 +4,7 @@
 
 import * as z from "zod/v4-mini";
 import { FluidapiCore } from "../core.js";
-import { encodeBodyForm } from "../lib/encodings.js";
+import { encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -23,37 +23,27 @@ import { ResponseValidationError } from "../models/errors/response-validation-er
 import { SDKError } from "../models/errors/sdk-error.js";
 import { SDKValidationError } from "../models/errors/sdk-validation-error.js";
 import * as models from "../models/index.js";
+import * as operations from "../models/operations/index.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Issue M2M token (client_credentials)
+ * Delete Flowkit activation
  *
  * @remarks
- * OAuth2 token endpoint for M2M (machine-to-machine) access.
- * Only `grant_type=client_credentials` is supported.
+ * Deletes an activated Flowkit by its activation identifier.
  *
- * Performs a `client_credentials` grant against the Authorization Server and
- * returns a Hydra-issued access token (JWT) following RFC 6749 token response format.
- *
- * The OAuth2 client must be registered first via
- * `POST /v1/tenants/{tenant_id}/credentials`.
- *
- * By default the token is issued with all scopes configured for the tenant.
- * You can request a subset by passing `scope`. Requesting a scope not in the
- * tenant's allowlist returns `400 invalid_scope`.
- *
- * > **User session refresh:** use `POST /users/token/refresh` instead.
- * > The client secret is handled server-side and must not be sent by browsers.
+ * This operation is currently scaffolded for SDK generation and uses a
+ * mock success response.
  */
-export function tokensIssue(
+export function flowkitsDeleteFlowkitActivation(
   client: FluidapiCore,
-  request: models.ClientCredentialsRequest,
+  request: operations.DeleteFlowkitActivationRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    models.TokenData,
-    | errors.OAuth2ErrorResponse
+    models.DeleteFlowkitActivationResponse,
+    | errors.ErrorResponse
     | SDKError
     | ResponseValidationError
     | ConnectionError
@@ -73,13 +63,13 @@ export function tokensIssue(
 
 async function $do(
   client: FluidapiCore,
-  request: models.ClientCredentialsRequest,
+  request: operations.DeleteFlowkitActivationRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      models.TokenData,
-      | errors.OAuth2ErrorResponse
+      models.DeleteFlowkitActivationResponse,
+      | errors.ErrorResponse
       | SDKError
       | ResponseValidationError
       | ConnectionError
@@ -94,22 +84,27 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => z.parse(models.ClientCredentialsRequest$outboundSchema, value),
+    (value) =>
+      z.parse(operations.DeleteFlowkitActivationRequest$outboundSchema, value),
     "Input validation failed",
   );
   if (!parsed.ok) {
     return [parsed, { status: "invalid" }];
   }
   const payload = parsed.value;
+  const body = null;
 
-  const body = Object.entries(payload || {}).map(([k, v]) => {
-    return encodeBodyForm(k, v, { charEncoding: "percent" });
-  }).join("&");
-
-  const path = pathToFunc("/oauth2/token")();
+  const pathParams = {
+    activationId: encodeSimple("activationId", payload.activationId, {
+      explode: false,
+      charEncoding: "percent",
+    }),
+  };
+  const path = pathToFunc("/contaazul/v1/flowkits/activations/{activationId}")(
+    pathParams,
+  );
 
   const headers = new Headers(compactMap({
-    "Content-Type": "application/x-www-form-urlencoded",
     Accept: "application/json",
   }));
 
@@ -120,7 +115,7 @@ async function $do(
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "issueM2MToken",
+    operationID: "deleteFlowkitActivation",
     oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,
@@ -134,7 +129,7 @@ async function $do(
 
   const requestRes = client._createRequest(context, {
     security: requestSecurity,
-    method: "POST",
+    method: "DELETE",
     baseURL: options?.serverURL,
     path: path,
     headers: headers,
@@ -149,7 +144,7 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["400", "401", "4XX", "502", "5XX"],
+    errorCodes: ["400", "401", "404", "4XX", "500", "5XX"],
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });
@@ -163,8 +158,8 @@ async function $do(
   };
 
   const [result] = await M.match<
-    models.TokenData,
-    | errors.OAuth2ErrorResponse
+    models.DeleteFlowkitActivationResponse,
+    | errors.ErrorResponse
     | SDKError
     | ResponseValidationError
     | ConnectionError
@@ -174,9 +169,9 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, models.TokenData$inboundSchema),
-    M.jsonErr([400, 401], errors.OAuth2ErrorResponse$inboundSchema),
-    M.jsonErr(502, errors.OAuth2ErrorResponse$inboundSchema),
+    M.json(200, models.DeleteFlowkitActivationResponse$inboundSchema),
+    M.jsonErr([400, 401, 404], errors.ErrorResponse$inboundSchema),
+    M.jsonErr(500, errors.ErrorResponse$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

@@ -3,6 +3,7 @@
  */
 
 import { ClientSDK } from "../lib/sdks.js";
+import { Flowkits } from "./flowkits.js";
 import { Metadata } from "./metadata.js";
 import { Session } from "./session.js";
 import { Tokens } from "./tokens.js";
@@ -21,5 +22,10 @@ export class Fluidapi extends ClientSDK {
   private _session?: Session;
   get session(): Session {
     return (this._session ??= new Session(this._options));
+  }
+
+  private _flowkits?: Flowkits;
+  get flowkits(): Flowkits {
+    return (this._flowkits ??= new Flowkits(this._options));
   }
 }

@@ -6,11 +6,11 @@ Public — Token issuance for tenants
 
 ### Available Operations
 
-* [issue](#issue) - Issue M2M token (client_credentials)
+* [issueM2MToken](#issuem2mtoken) - Issue M2M token (client_credentials)
 * [~~issueFluidTokenLegacy~~](#issuefluidtokenlegacy) - Issue Fluid-signed M2M token (legacy) :warning: **Deprecated**
-* [issueUser](#issueuser) - Issue bootstrap token for end user
+* [issueUserToken](#issueusertoken) - Issue bootstrap token for end user
 
-## issue
+## issueM2MToken
 
 OAuth2 token endpoint for M2M (machine-to-machine) access.
 Only `grant_type=client_credentials` is supported.
@@ -35,12 +35,10 @@ tenant's allowlist returns `400 invalid_scope`.
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issue({
+  const result = await fluidapi.tokens.issueM2MToken({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -59,16 +57,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
+import { tokensIssueM2MToken } from "fluidapi/funcs/tokens-issue-m2-m-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssue(fluidapi, {
+  const res = await tokensIssueM2MToken(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -78,7 +74,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssue failed:", res.error);
+    console.log("tokensIssueM2MToken failed:", res.error);
   }
 }
 
@@ -90,12 +86,10 @@ run();
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issue({
+  const result = await fluidapi.tokens.issueM2MToken({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -114,16 +108,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
+import { tokensIssueM2MToken } from "fluidapi/funcs/tokens-issue-m2-m-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssue(fluidapi, {
+  const res = await tokensIssueM2MToken(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -133,7 +125,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssue failed:", res.error);
+    console.log("tokensIssueM2MToken failed:", res.error);
   }
 }
 
@@ -145,12 +137,10 @@ run();
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issue({
+  const result = await fluidapi.tokens.issueM2MToken({
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -169,16 +159,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssue } from "fluidapi/funcs/tokens-issue.js";
+import { tokensIssueM2MToken } from "fluidapi/funcs/tokens-issue-m2-m-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssue(fluidapi, {
+  const res = await tokensIssueM2MToken(fluidapi, {
     grantType: "client_credentials",
     clientId: "fld-cred-acme-corp--api--postman-primary",
     clientSecret: "dGhpcyBpcyBhIHNlY3JldA",
@@ -188,7 +176,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssue failed:", res.error);
+    console.log("tokensIssueM2MToken failed:", res.error);
   }
 }
 
@@ -233,9 +221,7 @@ a JWT signed by Fluid carrying `workspace_id`, `tenant_id`, `client_id`, and
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.tokens.issueFluidTokenLegacy({
@@ -261,9 +247,7 @@ import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-t
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await tokensIssueFluidTokenLegacy(fluidapi, {
@@ -288,9 +272,7 @@ run();
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.tokens.issueFluidTokenLegacy({
@@ -316,9 +298,7 @@ import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-t
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await tokensIssueFluidTokenLegacy(fluidapi, {
@@ -343,9 +323,7 @@ run();
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new Fluidapi();
 
 async function run() {
   const result = await fluidapi.tokens.issueFluidTokenLegacy({
@@ -371,9 +349,7 @@ import { tokensIssueFluidTokenLegacy } from "fluidapi/funcs/tokens-issue-fluid-t
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
-});
+const fluidapi = new FluidapiCore();
 
 async function run() {
   const res = await tokensIssueFluidTokenLegacy(fluidapi, {
@@ -414,7 +390,7 @@ run();
 | errors.OAuth2ErrorResponse | 502                        | application/json           |
 | errors.SDKDefaultError     | 4XX, 5XX                   | \*/\*                      |
 
-## issueUser
+## issueUserToken
 
 Issues a short-lived bootstrap JWT for an end user (workspace or customer scope).
 
@@ -442,7 +418,7 @@ import { Fluidapi } from "fluidapi";
 const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUserToken({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -465,14 +441,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
+import { tokensIssueUserToken } from "fluidapi/funcs/tokens-issue-user-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(fluidapi, {
+  const res = await tokensIssueUserToken(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -486,7 +462,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssueUser failed:", res.error);
+    console.log("tokensIssueUserToken failed:", res.error);
   }
 }
 
@@ -501,7 +477,7 @@ import { Fluidapi } from "fluidapi";
 const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUserToken({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -524,14 +500,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
+import { tokensIssueUserToken } from "fluidapi/funcs/tokens-issue-user-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(fluidapi, {
+  const res = await tokensIssueUserToken(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -545,7 +521,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssueUser failed:", res.error);
+    console.log("tokensIssueUserToken failed:", res.error);
   }
 }
 
@@ -560,7 +536,7 @@ import { Fluidapi } from "fluidapi";
 const fluidapi = new Fluidapi();
 
 async function run() {
-  const result = await fluidapi.tokens.issueUser({
+  const result = await fluidapi.tokens.issueUserToken({
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -583,14 +559,14 @@ The standalone function version of this method:
 
 ```typescript
 import { FluidapiCore } from "fluidapi/core.js";
-import { tokensIssueUser } from "fluidapi/funcs/tokens-issue-user.js";
+import { tokensIssueUserToken } from "fluidapi/funcs/tokens-issue-user-token.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const fluidapi = new FluidapiCore();
 
 async function run() {
-  const res = await tokensIssueUser(fluidapi, {
+  const res = await tokensIssueUserToken(fluidapi, {
     bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
   }, {
     externalId: "user-123",
@@ -604,7 +580,7 @@ async function run() {
     const { value: result } = res;
     console.log(result);
   } else {
-    console.log("tokensIssueUser failed:", res.error);
+    console.log("tokensIssueUserToken failed:", res.error);
   }
 }
 

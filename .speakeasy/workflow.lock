@@ -1,4 +1,4 @@
-speakeasyVersion: 1.758.0
+speakeasyVersion: 1.759.0
 sources:
     auth:
         sourceNamespace: auth
@@ -7,12 +7,19 @@ sources:
         tags:
             - latest
             - 1.0.0
+    combined:
+        sourceNamespace: combined
+        sourceRevisionDigest: sha256:6b3d5b6e2e74548e337add42a89924098fbcc3e7869cc9d9b851385e7bbc8464
+        sourceBlobDigest: sha256:0a3c4bd9846466aa6db3ed58c0a92d5ed7f2ecce884b03c680f0156544bd8550
+        tags:
+            - latest
+            - 0.1.0
 targets:
     fluidapi:
-        source: auth
-        sourceNamespace: auth
-        sourceRevisionDigest: sha256:2c844654b2fa9a732bca91bf5ae7c6814a70c22b11fe4f4acc98bc3bcd751b72
-        sourceBlobDigest: sha256:311dff8e1c47a02e48fcf40e11b9451df16c66ce5d6ea8e4a5ea469e30fc76e5
+        source: combined
+        sourceNamespace: combined
+        sourceRevisionDigest: sha256:6b3d5b6e2e74548e337add42a89924098fbcc3e7869cc9d9b851385e7bbc8464
+        sourceBlobDigest: sha256:0a3c4bd9846466aa6db3ed58c0a92d5ed7f2ecce884b03c680f0156544bd8550
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
@@ -26,10 +33,10 @@ workflow:
                 location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
         combined:
             inputs:
-                - location: ./public.yaml
-                - location: ./mock.yaml
                 - location: combined.yaml
             output: out-combined
+            registry:
+                location: registry.speakeasyapi.dev/fluid/iam-sjd/combined
         mock:
             inputs:
                 - location: ./mock.yaml
@@ -39,7 +46,4 @@ workflow:
     targets:
         fluidapi:
             target: typescript
-            source: auth
-            publish:
-                npm:
-                    token: $npm_token
+            source: combined

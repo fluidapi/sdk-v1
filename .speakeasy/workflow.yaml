@@ -10,10 +10,10 @@ sources:
             location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
     combined:
         inputs:
-            - location: ./public.yaml
-            - location: ./mock.yaml
             - location: combined.yaml
         output: out-combined
+        registry:
+            location: registry.speakeasyapi.dev/fluid/iam-sjd/combined
     mock:
         inputs:
             - location: ./mock.yaml
@@ -23,7 +23,4 @@ sources:
 targets:
     fluidapi:
         target: typescript
-        source: auth
-        publish:
-            npm:
-                token: $npm_token
+        source: combined
