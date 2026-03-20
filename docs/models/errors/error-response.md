@@ -10,6 +10,7 @@ import { ErrorResponse } from "fluidapi/models/errors";
 
 ## Fields
 
-| Field              | Type               | Required           | Description        | Example            |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| `message`          | *string*           | :heavy_check_mark: | N/A                | unexpected error   |
+| Field                                    | Type                                     | Required                                 | Description                              | Example                                  |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| `ok`                                     | *boolean*                                | :heavy_check_mark:                       | N/A                                      | false                                    |
+| `error`                                  | [models.ErrorT](../../models/error-t.md) | :heavy_check_mark:                       | N/A                                      |                                          |

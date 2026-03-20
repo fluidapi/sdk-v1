@@ -5,26 +5,47 @@
 import * as z from "zod/v4-mini";
 import { remap as remap$ } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
+import * as openEnums from "../types/enums.js";
+import { OpenEnum } from "../types/enums.js";
 import { Result as SafeParseResult } from "../types/fp.js";
 import * as types from "../types/primitives.js";
+import { AuditByName, AuditByName$inboundSchema } from "./audit-by-name.js";
 import { SDKValidationError } from "./errors/sdk-validation-error.js";
-import {
-  FlowkitUserAudit,
-  FlowkitUserAudit$inboundSchema,
-} from "./flowkit-user-audit.js";
+
+export const FlowkitActivatedItemStatus = {
+  InProgress: "in_progress",
+  Success: "success",
+  Error: "error",
+  Cancelled: "cancelled",
+} as const;
+export type FlowkitActivatedItemStatus = OpenEnum<
+  typeof FlowkitActivatedItemStatus
+>;
 
 export type FlowkitActivatedItem = {
-  typename: string;
-  activations: number;
-  audit: FlowkitUserAudit;
-  connectors: Array<string>;
-  flowkitName: string;
-  flowkitRevision: string;
-  flows: number;
-  id: string;
-  identifier: string;
-  status: string;
+  typename?: string | undefined;
+  /**
+   * Composite ID — `{flowkit_name}-{revision}`.
+   */
+  id?: string | undefined;
+  flowkitName?: string | undefined;
+  flowkitRevision?: string | undefined;
+  /**
+   * Per-tenant identifier set at activation time.
+   */
+  identifier?: string | undefined;
+  status?: FlowkitActivatedItemStatus | undefined;
+  activations?: number | undefined;
+  flows?: number | undefined;
+  connectors?: Array<string> | undefined;
+  audit?: AuditByName | undefined;
 };
+
+/** @internal */
+export const FlowkitActivatedItemStatus$inboundSchema: z.ZodMiniType<
+  FlowkitActivatedItemStatus,
+  unknown
+> = openEnums.inboundSchema(FlowkitActivatedItemStatus);
 
 /** @internal */
 export const FlowkitActivatedItem$inboundSchema: z.ZodMiniType<
@@ -32,16 +53,16 @@ export const FlowkitActivatedItem$inboundSchema: z.ZodMiniType<
   unknown
 > = z.pipe(
   z.object({
-    __typename: types.string(),
-    activations: types.number(),
-    audit: FlowkitUserAudit$inboundSchema,
-    connectors: z.array(types.string()),
-    flowkit_name: types.string(),
-    flowkit_revision: types.string(),
-    flows: types.number(),
-    id: types.string(),
-    identifier: types.string(),
-    status: types.string(),
+    __typename: types.optional(types.string()),
+    id: types.optional(types.string()),
+    flowkit_name: types.optional(types.string()),
+    flowkit_revision: types.optional(types.string()),
+    identifier: types.optional(types.string()),
+    status: types.optional(FlowkitActivatedItemStatus$inboundSchema),
+    activations: types.optional(types.number()),
+    flows: types.optional(types.number()),
+    connectors: types.optional(z.array(types.string())),
+    audit: types.optional(AuditByName$inboundSchema),
   }),
   z.transform((v) => {
     return remap$(v, {

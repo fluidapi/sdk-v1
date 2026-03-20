@@ -13,7 +13,7 @@ Developer-friendly & type-safe Typescript SDK specifically catered to leverage *
 <!-- Start Summary [summary] -->
 ## Summary
 
-Fluid Flowkit API — Public: Public contract for token issuance and token-related public endpoints.
+Fluid Resources API: Public contract for token issuance and token-related public endpoints.
 
 ## Authentication
 
@@ -29,10 +29,19 @@ Fluid Flowkit API — Public: Public contract for token issuance and token-relat
 | Scope | Description |
 |---|---|
 | `fluid:api` | Full access to the Fluid API |
-Initial public contract for the client SDK bootstrap.
+OpenAPI contract for integration resource operations (flowkits, connectors, etc.).
 
-This first version documents the Flowkit activation operation based on the
-provided cURL request and successful `201 Created` response.
+## Authentication
+
+All endpoints require a **Bearer** token obtained via the token issuance flow.
+See `docs/openapi/token/public.yaml` for token acquisition.
+
+## Endpoints
+
+| Tag | Description |
+|---|---|
+| `flowkits` | Available flowkit definitions |
+| `activations` | Activated flowkit instances per tenant |
 <!-- End Summary [summary] -->
 
 <!-- Start Table of Contents [toc] -->
@@ -41,10 +50,12 @@ provided cURL request and successful `201 Created` response.
 * [fluidapi](#fluidapi)
   * [Authentication](#authentication)
   * [Scopes](#scopes)
+  * [Authentication](#authentication-1)
+  * [Endpoints](#endpoints)
   * [SDK Installation](#sdk-installation)
   * [Requirements](#requirements)
   * [SDK Example Usage](#sdk-example-usage)
-  * [Authentication](#authentication-1)
+  * [Authentication](#authentication-2)
   * [Available Resources and Operations](#available-resources-and-operations)
   * [Standalone functions](#standalone-functions)
   * [Retries](#retries)
@@ -180,11 +191,15 @@ run();
 <details open>
 <summary>Available methods</summary>
 
+### [Activations](docs/sdks/activations/README.md)
+
+* [listFlowkitActivations](docs/sdks/activations/README.md#listflowkitactivations) - List activated flowkits
+* [deleteFlowkitActivation](docs/sdks/activations/README.md#deleteflowkitactivation) - Delete a flowkit activation
+* [activateFlowkit](docs/sdks/activations/README.md#activateflowkit) - Activate a flowkit integration
+
 ### [Flowkits](docs/sdks/flowkits/README.md)
 
-* [activateFlowkit](docs/sdks/flowkits/README.md#activateflowkit) - Activate Flowkit
-* [listFlowkitActivations](docs/sdks/flowkits/README.md#listflowkitactivations) - List active Flowkits
-* [deleteFlowkitActivation](docs/sdks/flowkits/README.md#deleteflowkitactivation) - Delete Flowkit activation
+* [listFlowkits](docs/sdks/flowkits/README.md#listflowkits) - List available flowkits
 
 ### [Metadata](docs/sdks/metadata/README.md)
 
@@ -220,9 +235,10 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [`flowkitsActivateFlowkit`](docs/sdks/flowkits/README.md#activateflowkit) - Activate Flowkit
-- [`flowkitsDeleteFlowkitActivation`](docs/sdks/flowkits/README.md#deleteflowkitactivation) - Delete Flowkit activation
-- [`flowkitsListFlowkitActivations`](docs/sdks/flowkits/README.md#listflowkitactivations) - List active Flowkits
+- [`activationsActivateFlowkit`](docs/sdks/activations/README.md#activateflowkit) - Activate a flowkit integration
+- [`activationsDeleteFlowkitActivation`](docs/sdks/activations/README.md#deleteflowkitactivation) - Delete a flowkit activation
+- [`activationsListFlowkitActivations`](docs/sdks/activations/README.md#listflowkitactivations) - List activated flowkits
+- [`flowkitsListFlowkits`](docs/sdks/flowkits/README.md#listflowkits) - List available flowkits
 - [`metadataGetJWKS`](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
 - [`metadataHealthCheck`](docs/sdks/metadata/README.md#healthcheck) - Health check
 - [`sessionExchangeBootstrapToken`](docs/sdks/session/README.md#exchangebootstraptoken) - Exchange bootstrap token for user session
@@ -330,7 +346,8 @@ async function run() {
 
       // Depending on the method different errors may be thrown
       if (error instanceof errors.ErrorResponse) {
-        console.log(error.data$.message); // string
+        console.log(error.data$.ok); // boolean
+        console.log(error.data$.error); // models.ErrorT
       }
     }
   }
@@ -357,8 +374,8 @@ run();
 
 
 **Inherit from [`SDKError`](./src/models/errors/sdk-error.ts)**:
-* [`OAuth2ErrorResponse`](./src/models/errors/o-auth2-error-response.ts): Invalid request parameters. Applicable to 5 of 10 methods.*
-* [`ErrorResponse`](./src/models/errors/error-response.ts): Applicable to 5 of 10 methods.*
+* [`OAuth2ErrorResponse`](./src/models/errors/o-auth2-error-response.ts): Invalid request parameters. Applicable to 5 of 11 methods.*
+* [`ErrorResponse`](./src/models/errors/error-response.ts): Status code `503`. Applicable to 2 of 11 methods.*
 * [`ResponseValidationError`](./src/models/errors/response-validation-error.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>

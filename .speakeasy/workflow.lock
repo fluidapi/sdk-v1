@@ -14,12 +14,19 @@ sources:
         tags:
             - latest
             - 0.1.0
+    resources:
+        sourceNamespace: resources
+        sourceRevisionDigest: sha256:e45597efa7259e6d28945749c838a0720aefb26771253915db49772862e588f8
+        sourceBlobDigest: sha256:42524c1f74cf3e2061af3a37cbd63cee205344676c670e07e879c18242752532
+        tags:
+            - latest
+            - 1.0.0
 targets:
     fluidapi:
-        source: combined
-        sourceNamespace: combined
-        sourceRevisionDigest: sha256:6b3d5b6e2e74548e337add42a89924098fbcc3e7869cc9d9b851385e7bbc8464
-        sourceBlobDigest: sha256:0a3c4bd9846466aa6db3ed58c0a92d5ed7f2ecce884b03c680f0156544bd8550
+        source: resources
+        sourceNamespace: resources
+        sourceRevisionDigest: sha256:e45597efa7259e6d28945749c838a0720aefb26771253915db49772862e588f8
+        sourceBlobDigest: sha256:42524c1f74cf3e2061af3a37cbd63cee205344676c670e07e879c18242752532
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
@@ -43,10 +50,17 @@ workflow:
             overlays:
                 - location: public.yaml
             output: combined.yaml
+        resources:
+            inputs:
+                - location: public.yaml
+                - location: resources.yaml
+            output: out-resources
+            registry:
+                location: registry.speakeasyapi.dev/fluid/iam-sjd/resources
     targets:
         fluidapi:
             target: typescript
-            source: combined
+            source: resources
             publish:
                 npm:
                     token: $npm_token

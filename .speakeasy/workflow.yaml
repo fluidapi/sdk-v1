@@ -14,6 +14,13 @@ sources:
     output: out-combined
     registry:
       location: registry.speakeasyapi.dev/fluid/iam-sjd/combined
+  resources:
+    inputs:
+      - location: public.yaml
+      - location: resources.yaml
+    output: out-resources
+    registry:
+      location: registry.speakeasyapi.dev/fluid/iam-sjd/resources
   mock:
     inputs:
       - location: ./mock.yaml
@@ -23,7 +30,7 @@ sources:
 targets:
   fluidapi:
     target: typescript
-    source: combined
+    source: resources
     publish:
       npm:
         token: $npm_token

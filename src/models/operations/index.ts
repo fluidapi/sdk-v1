@@ -5,3 +5,5 @@
 export * from "./activate-flowkit.js";
 export * from "./delete-flowkit-activation.js";
 export * from "./issue-user-token.js";
+export * from "./list-flowkit-activations.js";
+export * from "./list-flowkits.js";

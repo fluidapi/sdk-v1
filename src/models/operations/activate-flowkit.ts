@@ -7,7 +7,15 @@ import * as models from "../index.js";
 
 export type ActivateFlowkitRequest = {
   /**
-   * Activation key used to authorize the Flowkit activation.
+   * Tenant slug (e.g. `contaazul`).
+   */
+  tenant: string;
+  /**
+   * Integration identifier (e.g. `tray`, `contaazulprivado`).
+   */
+  integration: string;
+  /**
+   * Flowkit definition key (UUID).
    */
   key: string;
   body: models.ActivateFlowkitRequest;
@@ -15,6 +23,8 @@ export type ActivateFlowkitRequest = {
 
 /** @internal */
 export type ActivateFlowkitRequest$Outbound = {
+  tenant: string;
+  integration: string;
   key: string;
   body: models.ActivateFlowkitRequest$Outbound;
 };
@@ -24,6 +34,8 @@ export const ActivateFlowkitRequest$outboundSchema: z.ZodMiniType<
   ActivateFlowkitRequest$Outbound,
   ActivateFlowkitRequest
 > = z.object({
+  tenant: z.string(),
+  integration: z.string(),
   key: z.string(),
   body: models.ActivateFlowkitRequest$outboundSchema,
 });

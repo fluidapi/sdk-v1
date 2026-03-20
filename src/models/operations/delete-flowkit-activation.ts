@@ -6,14 +6,19 @@ import * as z from "zod/v4-mini";
 
 export type DeleteFlowkitActivationRequest = {
   /**
-   * Identifier of the activated Flowkit to delete.
+   * Tenant slug (e.g. `contaazul`).
    */
-  activationId: string;
+  tenant: string;
+  /**
+   * Activation ID to delete (e.g. `bling-linx-1.0.7`).
+   */
+  id: string;
 };
 
 /** @internal */
 export type DeleteFlowkitActivationRequest$Outbound = {
-  activationId: string;
+  tenant: string;
+  id: string;
 };
 
 /** @internal */
@@ -21,7 +26,8 @@ export const DeleteFlowkitActivationRequest$outboundSchema: z.ZodMiniType<
   DeleteFlowkitActivationRequest$Outbound,
   DeleteFlowkitActivationRequest
 > = z.object({
-  activationId: z.string(),
+  tenant: z.string(),
+  id: z.string(),
 });
 
 export function deleteFlowkitActivationRequestToJSON(

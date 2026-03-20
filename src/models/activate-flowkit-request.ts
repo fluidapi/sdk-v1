@@ -3,26 +3,79 @@
  */
 
 import * as z from "zod/v4-mini";
-import {
-  FlowkitActivationContext,
-  FlowkitActivationContext$Outbound,
-  FlowkitActivationContext$outboundSchema,
-} from "./flowkit-activation-context.js";
-import {
-  FlowkitCredentials,
-  FlowkitCredentials$Outbound,
-  FlowkitCredentials$outboundSchema,
-} from "./flowkit-credentials.js";
+import { remap as remap$ } from "../lib/primitives.js";
+
+/**
+ * Per-tenant runtime metadata passed to the flowkit.
+ */
+export type ActivateFlowkitRequestData = {
+  /**
+   * Unique identifier for this activation within the tenant.
+   */
+  identifier?: string | undefined;
+  xTenantId?: string | undefined;
+  xUserId?: string | undefined;
+  xEmail?: string | undefined;
+  [additionalProperties: string]: unknown;
+};
 
 export type ActivateFlowkitRequest = {
-  credentials: FlowkitCredentials;
-  data: FlowkitActivationContext;
+  /**
+   * Connector-specific authentication credentials.
+   */
+  credentials: { [k: string]: any };
+  /**
+   * Per-tenant runtime metadata passed to the flowkit.
+   */
+  data: ActivateFlowkitRequestData;
 };
 
 /** @internal */
+export type ActivateFlowkitRequestData$Outbound = {
+  identifier?: string | undefined;
+  "x-tenantId"?: string | undefined;
+  "x-userId"?: string | undefined;
+  "x-email"?: string | undefined;
+  [additionalProperties: string]: unknown;
+};
+
+/** @internal */
+export const ActivateFlowkitRequestData$outboundSchema: z.ZodMiniType<
+  ActivateFlowkitRequestData$Outbound,
+  ActivateFlowkitRequestData
+> = z.pipe(
+  z.catchall(
+    z.object({
+      identifier: z.optional(z.string()),
+      xTenantId: z.optional(z.string()),
+      xUserId: z.optional(z.string()),
+      xEmail: z.optional(z.string()),
+    }),
+    z.any(),
+  ),
+  z.transform((v) => {
+    return {
+      ...remap$(v, {
+        xTenantId: "x-tenantId",
+        xUserId: "x-userId",
+        xEmail: "x-email",
+      }),
+    };
+  }),
+);
+
+export function activateFlowkitRequestDataToJSON(
+  activateFlowkitRequestData: ActivateFlowkitRequestData,
+): string {
+  return JSON.stringify(
+    ActivateFlowkitRequestData$outboundSchema.parse(activateFlowkitRequestData),
+  );
+}
+
+/** @internal */
 export type ActivateFlowkitRequest$Outbound = {
-  credentials: FlowkitCredentials$Outbound;
-  data: FlowkitActivationContext$Outbound;
+  credentials: { [k: string]: any };
+  data: ActivateFlowkitRequestData$Outbound;
 };
 
 /** @internal */
@@ -30,8 +83,8 @@ export const ActivateFlowkitRequest$outboundSchema: z.ZodMiniType<
   ActivateFlowkitRequest$Outbound,
   ActivateFlowkitRequest
 > = z.object({
-  credentials: FlowkitCredentials$outboundSchema,
-  data: FlowkitActivationContext$outboundSchema,
+  credentials: z.record(z.string(), z.any()),
+  data: z.lazy(() => ActivateFlowkitRequestData$outboundSchema),
 });
 
 export function activateFlowkitRequestToJSON(

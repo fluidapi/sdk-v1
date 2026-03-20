@@ -1,0 +1,713 @@
+openapi: "3.1.0"
+
+info:
+  title: Fluid Resources API
+  description: |
+    OpenAPI contract for integration resource operations (flowkits, connectors, etc.).
+
+    ## Authentication
+
+    All endpoints require a **Bearer** token obtained via the token issuance flow.
+    See `docs/openapi/token/public.yaml` for token acquisition.
+
+    ## Endpoints
+
+    | Tag | Description |
+    |---|---|
+    | `flowkits` | Available flowkit definitions |
+    | `activations` | Activated flowkit instances per tenant |
+  version: "1.0.0"
+  contact:
+    name: Fluid API Team
+    email: api@fluidapi.com
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+
+servers:
+  - url: "{scheme}://{host}"
+    description: Configurable environment
+    variables:
+      scheme:
+        default: https
+        enum: [http, https]
+      host:
+        default: id.dev.api.fluidapi.io
+        enum:
+          - id.dev.api.fluidapi.io
+          - id.api.fluidapi.io
+          - localhost:9999
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: flowkits
+    description: Available flowkit definitions (catalog)
+  - name: activations
+    description: Activated flowkit instances — list, activate and delete
+
+paths:
+  # ── Catalog (deixar para depois) ──────────────────────────────────────────
+  /{tenant}/v1/flowkits:
+    get:
+      summary: List available flowkits
+      description: |
+        Returns the catalog of flowkit definitions available to the authenticated tenant.
+
+        > **Status**: endpoint reservado — documentação detalhada pendente.
+      operationId: listFlowkits
+      tags: [flowkits]
+      parameters:
+        - $ref: "#/components/parameters/tenant"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated list of available flowkit definitions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowkitListResponse"
+              example:
+                data:
+                  data:
+                    - __typename: FlowKit
+                      id: conta-azul-flexy-1.0.0
+                      name: conta-azul-flexy
+                      title: Conta Azul-Flexy
+                      revision: "1.0.0"
+                      description: >
+                        O Flowkit Conta Azul-Flexy conecta seu marketplace Flexy ao sistema
+                        Conta Azul, automatizando a troca de informações entre as duas plataformas.
+                      tenant_id: fluid-31de26d847544df9b3259dff43c99f00
+                      connectors:
+                        - connector_id: "649dde09ea56f7ab5743963f"
+                          connector_slug: conditional-if
+                        - connector_id: "64be93a5a1fb031f8ec62a39"
+                          connector_slug: conta-azul
+                        - connector_id: "63f79e1d936914e64f42897b"
+                          connector_slug: loop-for
+                        - connector_id: "646bcc3e8058dd77254fb149"
+                          connector_slug: flexy
+                      flows:
+                        - flow_revision: 0
+                        - flow_revision: 0
+                        - flow_revision: 0
+                      params:
+                        - key: descricao_centro_custo
+                          description: Descrição do Centro de Custo
+                          type: string
+                          required: true
+                        - key: descricao_categoria
+                          description: Descrição da Categoria
+                          type: string
+                          required: true
+                      audit:
+                        updated:
+                          first_name: ""
+                          last_name: ""
+                          timestamp: "2025-10-13T13:58:17.052Z"
+                    - __typename: FlowKit
+                      id: cria-despesas-conta--1.0.0
+                      name: cria-despesas-conta-
+                      title: cria despesas conta azul
+                      revision: "1.0.0"
+                      description: ""
+                      tenant_id: trials-34d6a1d89e6c4aa2a94d68ac50c1778d
+                      connectors:
+                        - connector_id: "64be93a5a1fb031f8ec62a39"
+                          connector_slug: conta-azul
+                        - connector_id: "649dde09ea56f7ab5743963f"
+                          connector_slug: conditional-if
+                        - connector_id: "669eae12bd8c259f40dae43a"
+                          connector_slug: fluid-error
+                      flows:
+                        - flow_revision: 0
+                      params:
+                        - key: descricao_conta
+                          description: Descrição da Conta Financeira onde serão lançadas as contas a pagar no Conta Azul
+                          type: string
+                          required: true
+                      audit:
+                        updated:
+                          first_name: ""
+                          last_name: ""
+                          timestamp: "2025-10-12T16:15:13.665Z"
+                    - __typename: FlowKit
+                      id: payfy-conta-azul-1.0.1
+                      name: payfy-conta-azul
+                      title: Payfy-Conta Azul
+                      revision: "1.0.1"
+                      description: Recebe despesas aprovadas da Payfy e Integra com o Contas a Pagar do Conta Azul
+                      tenant_id: trials-34d6a1d89e6c4aa2a94d68ac50c1778d
+                      connectors:
+                        - connector_id: "669eae12bd8c259f40dae43a"
+                          connector_slug: fluid-error
+                        - connector_id: "649dde09ea56f7ab5743963f"
+                          connector_slug: conditional-if
+                        - connector_id: "64be93a5a1fb031f8ec62a39"
+                          connector_slug: conta-azul
+                      flows:
+                        - flow_revision: 0
+                      params:
+                        - key: descricao_conta
+                          description: Descrição da Conta Financeira onde serão lançadas as contas a pagar no Conta Azul.
+                          type: string
+                          required: true
+                      audit:
+                        updated:
+                          first_name: ""
+                          last_name: ""
+                          timestamp: "2025-10-13T14:35:29.216Z"
+                    - __typename: FlowKit
+                      id: pipedrive-x-conta-az-1.0.2
+                      name: pipedrive-x-conta-az
+                      title: pipedrive x conta azul
+                      revision: "1.0.2"
+                      description: ""
+                      tenant_id: trials-34d6a1d89e6c4aa2a94d68ac50c1778d
+                      connectors:
+                        - connector_id: "67cb30e5c7c14a571da934b0"
+                          connector_slug: pipedrive
+                        - connector_id: "64be93a5a1fb031f8ec62a39"
+                          connector_slug: conta-azul
+                        - connector_id: "649dde09ea56f7ab5743963f"
+                          connector_slug: conditional-if
+                      flows:
+                        - flow_revision: 0
+                        - flow_revision: 0
+                      params:
+                        - key: data_inicio
+                          description: ""
+                          type: string
+                          required: true
+                        - key: data_fim
+                          description: ""
+                          type: string
+                          required: true
+                      audit:
+                        updated:
+                          first_name: ""
+                          last_name: ""
+                          timestamp: "2025-10-14T15:06:56.148Z"
+                  total:
+                    __typename: Meta
+                    count: 4
+        "401":
+          description: Missing or invalid Bearer token.
+
+  # ── Activations ───────────────────────────────────────────────────────────
+  /{tenant}/v1/flowkits/activations:
+    get:
+      summary: List activated flowkits
+      description: Returns all flowkit activations for the authenticated tenant.
+      operationId: listFlowkitActivations
+      tags: [activations]
+      parameters:
+        - $ref: "#/components/parameters/tenant"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated list of active flowkit instances.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowkitActivationListResponse"
+              example:
+                data:
+                  data:
+                    - __typename: FlowKitActivatedResponse
+                      id: bling-linx-1.0.7
+                      flowkit_name: bling-linx
+                      flowkit_revision: "1.0.7"
+                      identifier: flowkit-test-test
+                      status: success
+                      activations: 1
+                      flows: 4
+                      connectors:
+                        - linx-commerce
+                        - fluid-flow
+                        - storage
+                        - http
+                      audit:
+                        created:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:54:41.103Z"
+                        updated:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:54:41.103Z"
+                    - __typename: FlowKitActivatedResponse
+                      id: fluidacademy-1.0.0
+                      flowkit_name: fluidacademy
+                      flowkit_revision: "1.0.0"
+                      identifier: omiesupabase
+                      status: success
+                      activations: 1
+                      flows: 2
+                      connectors:
+                        - omie
+                        - sql-mongo
+                      audit:
+                        created:
+                          first_name: Aurélio
+                          last_name: Costa
+                          timestamp: "2026-02-03T22:48:25.375Z"
+                        updated:
+                          first_name: Aurélio
+                          last_name: Costa
+                          timestamp: "2026-02-03T22:48:25.375Z"
+                    - __typename: FlowKitActivatedResponse
+                      id: fluxointer-1.0.0
+                      flowkit_name: fluxointer
+                      flowkit_revision: "1.0.0"
+                      identifier: inter-todasops
+                      status: success
+                      activations: 1
+                      flows: 1
+                      connectors: []
+                      audit:
+                        created:
+                          first_name: Daniel
+                          last_name: Dias
+                          timestamp: "2025-11-13T17:30:57.312Z"
+                        updated:
+                          first_name: Daniel
+                          last_name: Dias
+                          timestamp: "2025-11-13T17:30:57.312Z"
+                    - __typename: FlowKitActivatedResponse
+                      id: nexaas-omie-1.0.0
+                      flowkit_name: nexaas-omie
+                      flowkit_revision: "1.0.0"
+                      identifier: clientexyz
+                      status: success
+                      activations: 1
+                      flows: 3
+                      connectors:
+                        - http
+                        - nexaas
+                        - omie
+                      audit:
+                        created:
+                          first_name: Daniel
+                          last_name: Dias
+                          timestamp: "2025-10-01T18:39:41.689Z"
+                        updated:
+                          first_name: Daniel
+                          last_name: Dias
+                          timestamp: "2025-10-01T18:39:41.689Z"
+                  total:
+                    __typename: Meta
+                    count: 4
+        "401":
+          description: Missing or invalid Bearer token.
+
+    delete:
+      summary: Delete a flowkit activation
+      description: |
+        Removes an active flowkit instance for the authenticated tenant.
+
+        The activation to be removed is identified by query parameters.
+      operationId: deleteFlowkitActivation
+      tags: [activations]
+      parameters:
+        - $ref: "#/components/parameters/tenant"
+        - name: id
+          in: query
+          required: true
+          description: Activation ID to delete (e.g. `bling-linx-1.0.7`).
+          schema:
+            type: string
+            example: bling-linx-1.0.7
+      responses:
+        "204":
+          description: Activation deleted successfully. No content returned.
+        "401":
+          description: Missing or invalid Bearer token.
+        "404":
+          description: Activation not found.
+
+  # ── Activate ──────────────────────────────────────────────────────────────
+  /{tenant}/v1/flowkits/{integration}/activate:
+    post:
+      summary: Activate a flowkit integration
+      description: |
+        Activates a flowkit for the given tenant and integration, supplying
+        connector credentials and per-tenant runtime data.
+
+        The `key` query parameter identifies the flowkit definition to activate.
+      operationId: activateFlowkit
+      tags: [activations]
+      parameters:
+        - $ref: "#/components/parameters/tenant"
+        - name: integration
+          in: path
+          required: true
+          description: Integration identifier (e.g. `tray`, `contaazulprivado`).
+          schema:
+            type: string
+            example: tray
+        - name: key
+          in: query
+          required: true
+          description: Flowkit definition key (UUID).
+          schema:
+            type: string
+            format: uuid
+            example: dab7e862-5899-4993-b50b-2fe8c4535b8e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateFlowkitRequest"
+            example:
+              credentials:
+                url: "https://1225878.commercesuite.com.br"
+                code: "504c234370fd5bc6224ad99e154c039fbecbd9d893fajsdoi78y87sdysj9sdd"
+              data:
+                identifier: "loja01"
+                x-tenantId: "3363001"
+                x-userId: "58139234"
+                x-email: "1d46cf93-68c7-4106-345s-43f147ecdd67@devportal.com"
+      responses:
+        "201":
+          description: Flowkit activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowkitActivationRecord"
+              example:
+                id: "9074bd4d-23e0-11f1-b769-4e4d4c5f610c"
+                flowkit_name: "conta-azul-tray-2"
+                flowkit_revision: "1.0.0"
+                description: "descricao do flowkit"
+                identifier: "loja06"
+                published: true
+                status: "in_progress"
+                connectors:
+                  - contaazulprivado
+                  - tray
+                audit:
+                  created:
+                    timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                    user_id: "bc32c03a-e885-4641-aaac-ca9358703d07"
+                  updated:
+                    timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                    user_id: "bc32c03a-e885-4641-aaac-ca9358703d07"
+                  update_history:
+                    - timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                      user_id: "bc32c03a-e885-4641-aaac-ca9358703d07"
+        "400":
+          description: Invalid request body or missing required fields.
+        "401":
+          description: Missing or invalid Bearer token.
+        "404":
+          description: Flowkit definition not found for the given key.
+        "409":
+          description: Flowkit already activated for this identifier.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    tenant:
+      name: tenant
+      in: path
+      required: true
+      description: Tenant slug (e.g. `contaazul`).
+      schema:
+        type: string
+        example: contaazul
+
+  schemas:
+    # ── Pagination wrapper ─────────────────────────────────────────────────
+    Meta:
+      type: object
+      properties:
+        __typename:
+          type: string
+          example: Meta
+        count:
+          type: integer
+          example: 4
+
+    # ── Audit (two variants) ───────────────────────────────────────────────
+    AuditEntryById:
+      description: Audit entry carrying a user_id (activation response).
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-03-19T19:11:22.841037415-03:00"
+        user_id:
+          type: string
+          format: uuid
+          example: "bc32c03a-e885-4641-aaac-ca9358703d07"
+
+    AuditEntryByName:
+      description: Audit entry carrying first_name / last_name (list responses).
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: Luigi
+        last_name:
+          type: string
+          example: da Silva
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-02-27T14:54:41.103Z"
+
+    AuditById:
+      type: object
+      properties:
+        created:
+          $ref: "#/components/schemas/AuditEntryById"
+        updated:
+          $ref: "#/components/schemas/AuditEntryById"
+        update_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEntryById"
+
+    AuditByName:
+      type: object
+      properties:
+        created:
+          $ref: "#/components/schemas/AuditEntryByName"
+        updated:
+          $ref: "#/components/schemas/AuditEntryByName"
+
+    # ── Flowkit catalog ────────────────────────────────────────────────────
+    FlowkitConnectorRef:
+      type: object
+      properties:
+        connector_id:
+          type: string
+          example: "64be93a5a1fb031f8ec62a39"
+        connector_slug:
+          type: string
+          example: conta-azul
+
+    FlowkitFlowRef:
+      type: object
+      properties:
+        flow_revision:
+          type: integer
+          example: 0
+
+    FlowkitParam:
+      type: object
+      required: [key, type, required]
+      properties:
+        key:
+          type: string
+          example: descricao_centro_custo
+        description:
+          type: string
+          example: Descrição do Centro de Custo
+        type:
+          type: string
+          example: string
+        required:
+          type: boolean
+          example: true
+
+    FlowkitDefinition:
+      type: object
+      properties:
+        __typename:
+          type: string
+          example: FlowKit
+        id:
+          type: string
+          example: conta-azul-flexy-1.0.0
+        name:
+          type: string
+          example: conta-azul-flexy
+        title:
+          type: string
+          example: Conta Azul-Flexy
+        revision:
+          type: string
+          example: "1.0.0"
+        description:
+          type: string
+        tenant_id:
+          type: string
+          example: fluid-31de26d847544df9b3259dff43c99f00
+        connectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowkitConnectorRef"
+        flows:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowkitFlowRef"
+        params:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowkitParam"
+        audit:
+          type: object
+          properties:
+            updated:
+              $ref: "#/components/schemas/AuditEntryByName"
+
+    FlowkitListResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/FlowkitDefinition"
+            total:
+              $ref: "#/components/schemas/Meta"
+
+    # ── Activated instances ────────────────────────────────────────────────
+    FlowkitActivatedItem:
+      type: object
+      properties:
+        __typename:
+          type: string
+          example: FlowKitActivatedResponse
+        id:
+          type: string
+          description: Composite ID — `{flowkit_name}-{revision}`.
+          example: bling-linx-1.0.7
+        flowkit_name:
+          type: string
+          example: bling-linx
+        flowkit_revision:
+          type: string
+          example: "1.0.7"
+        identifier:
+          type: string
+          description: Per-tenant identifier set at activation time.
+          example: flowkit-test-test
+        status:
+          type: string
+          enum: [in_progress, success, error, cancelled]
+          example: success
+        activations:
+          type: integer
+          example: 1
+        flows:
+          type: integer
+          example: 4
+        connectors:
+          type: array
+          items:
+            type: string
+          example: [linx-commerce, fluid-flow, storage, http]
+        audit:
+          $ref: "#/components/schemas/AuditByName"
+
+    FlowkitActivationListResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/FlowkitActivatedItem"
+            total:
+              $ref: "#/components/schemas/Meta"
+
+    # ── Activate request / response ────────────────────────────────────────
+    ActivateFlowkitRequest:
+      type: object
+      required: [credentials, data]
+      properties:
+        credentials:
+          type: object
+          description: Connector-specific authentication credentials.
+          additionalProperties: true
+          example:
+            url: "https://1225878.commercesuite.com.br"
+            code: "504c234370fd5bc6224ad99e154c039fbecbd9d893..."
+        data:
+          type: object
+          description: Per-tenant runtime metadata passed to the flowkit.
+          properties:
+            identifier:
+              type: string
+              description: Unique identifier for this activation within the tenant.
+              example: loja01
+            x-tenantId:
+              type: string
+              example: "3363001"
+            x-userId:
+              type: string
+              example: "58139234"
+            x-email:
+              type: string
+              format: email
+              example: "user@devportal.com"
+          additionalProperties: true
+
+    FlowkitActivationRecord:
+      type: object
+      description: Activation record returned after a successful POST activate.
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "9074bd4d-23e0-11f1-b769-4e4d4c5f610c"
+        flowkit_name:
+          type: string
+          example: conta-azul-tray-2
+        flowkit_revision:
+          type: string
+          example: "1.0.0"
+        description:
+          type: string
+          example: descricao do flowkit
+        identifier:
+          type: string
+          example: loja06
+        published:
+          type: boolean
+          example: true
+        status:
+          type: string
+          enum: [in_progress, active, error, cancelled]
+          example: in_progress
+        connectors:
+          type: array
+          items:
+            type: string
+          example: [contaazulprivado, tray]
+        audit:
+          $ref: "#/components/schemas/AuditById"
