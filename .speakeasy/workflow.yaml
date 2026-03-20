@@ -1,26 +1,29 @@
 workflowVersion: 1.0.0
 speakeasyVersion: latest
 sources:
-    auth:
-        inputs:
-            - location: ./public.yaml
-        overlays:
-            - location: .speakeasy/speakeasy-modifications-overlay.yaml
-        registry:
-            location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
-    combined:
-        inputs:
-            - location: combined.yaml
-        output: out-combined
-        registry:
-            location: registry.speakeasyapi.dev/fluid/iam-sjd/combined
-    mock:
-        inputs:
-            - location: ./mock.yaml
-        overlays:
-            - location: public.yaml
-        output: combined.yaml
+  auth:
+    inputs:
+      - location: ./public.yaml
+    overlays:
+      - location: .speakeasy/speakeasy-modifications-overlay.yaml
+    registry:
+      location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
+  combined:
+    inputs:
+      - location: combined.yaml
+    output: out-combined
+    registry:
+      location: registry.speakeasyapi.dev/fluid/iam-sjd/combined
+  mock:
+    inputs:
+      - location: ./mock.yaml
+    overlays:
+      - location: public.yaml
+    output: combined.yaml
 targets:
-    fluidapi:
-        target: typescript
-        source: combined
+  fluidapi:
+    target: typescript
+    source: combined
+    publish:
+      npm:
+        token: $npm_token

@@ -47,3 +47,6 @@ workflow:
         fluidapi:
             target: typescript
             source: combined
+            publish:
+                npm:
+                    token: $npm_token
