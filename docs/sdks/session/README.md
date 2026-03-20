@@ -26,14 +26,14 @@ The resulting `refresh_token` can be renewed via `POST /users/token/refresh`.
 
 <!-- UsageSnippet language="typescript" operationID="exchangeBootstrapToken" method="post" path="/users/token/exchange" -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.session.exchangeBootstrapToken({
+  const result = await sdk.session.exchangeBootstrapToken({
     token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
   });
 
@@ -48,17 +48,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { sessionExchangeBootstrapToken } from "fluidapi/funcs/session-exchange-bootstrap-token.js";
+import { SDKCore } from "openapi/core.js";
+import { sessionExchangeBootstrapToken } from "openapi/funcs/session-exchange-bootstrap-token.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionExchangeBootstrapToken(fluidapi, {
+  const res = await sessionExchangeBootstrapToken(sdk, {
     token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",
   });
   if (res.ok) {
@@ -87,11 +87,11 @@ run();
 
 ### Errors
 
-| Error Type                  | Status Code                 | Content Type                |
-| --------------------------- | --------------------------- | --------------------------- |
-| errors.OAuth2ErrorResponse  | 400, 401                    | application/json            |
-| errors.OAuth2ErrorResponse  | 502                         | application/json            |
-| errors.FluidapiDefaultError | 4XX, 5XX                    | \*/\*                       |
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.OAuth2ErrorResponse | 400, 401                   | application/json           |
+| errors.OAuth2ErrorResponse | 502                        | application/json           |
+| errors.SDKDefaultError     | 4XX, 5XX                   | \*/\*                      |
 
 ## refreshUserSession
 
@@ -107,14 +107,14 @@ only the `refresh_token` is required.
 
 <!-- UsageSnippet language="typescript" operationID="refreshUserSession" method="post" path="/users/token/refresh" example="invalid_body" -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.session.refreshUserSession({
+  const result = await sdk.session.refreshUserSession({
     refreshToken: "ory_rt_...",
   });
 
@@ -129,17 +129,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-session.js";
+import { SDKCore } from "openapi/core.js";
+import { sessionRefreshUserSession } from "openapi/funcs/session-refresh-user-session.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionRefreshUserSession(fluidapi, {
+  const res = await sessionRefreshUserSession(sdk, {
     refreshToken: "ory_rt_...",
   });
   if (res.ok) {
@@ -156,14 +156,14 @@ run();
 
 <!-- UsageSnippet language="typescript" operationID="refreshUserSession" method="post" path="/users/token/refresh" example="invalid_grant" -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.session.refreshUserSession({
+  const result = await sdk.session.refreshUserSession({
     refreshToken: "ory_rt_...",
   });
 
@@ -178,17 +178,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { sessionRefreshUserSession } from "fluidapi/funcs/session-refresh-user-session.js";
+import { SDKCore } from "openapi/core.js";
+import { sessionRefreshUserSession } from "openapi/funcs/session-refresh-user-session.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await sessionRefreshUserSession(fluidapi, {
+  const res = await sessionRefreshUserSession(sdk, {
     refreshToken: "ory_rt_...",
   });
   if (res.ok) {
@@ -217,8 +217,8 @@ run();
 
 ### Errors
 
-| Error Type                  | Status Code                 | Content Type                |
-| --------------------------- | --------------------------- | --------------------------- |
-| errors.OAuth2ErrorResponse  | 400, 401                    | application/json            |
-| errors.OAuth2ErrorResponse  | 502                         | application/json            |
-| errors.FluidapiDefaultError | 4XX, 5XX                    | \*/\*                       |
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.OAuth2ErrorResponse | 400, 401                   | application/json           |
+| errors.OAuth2ErrorResponse | 502                        | application/json           |
+| errors.SDKDefaultError     | 4XX, 5XX                   | \*/\*                      |

@@ -7,7 +7,7 @@ import { Metadata } from "./metadata.js";
 import { Session } from "./session.js";
 import { Tokens } from "./tokens.js";
 
-export class Fluidapi extends ClientSDK {
+export class SDK extends ClientSDK {
   private _metadata?: Metadata;
   get metadata(): Metadata {
     return (this._metadata ??= new Metadata(this._options));

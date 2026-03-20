@@ -3,10 +3,10 @@
  */
 
 import * as z from "zod/v4/core";
-import { FluidapiError } from "./fluidapi-error.js";
+import { SDKError } from "./sdk-error.js";
 import { formatZodError } from "./sdk-validation-error.js";
 
-export class ResponseValidationError extends FluidapiError {
+export class ResponseValidationError extends SDKError {
   /**
    * The raw value that failed validation.
    */

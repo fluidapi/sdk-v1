@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ErrorResponse } from "fluidapi/models/errors";
+import { ErrorResponse } from "openapi/models/errors";
 
 // No examples available for this model
 ```

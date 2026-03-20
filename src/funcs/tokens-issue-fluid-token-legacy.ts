@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod/v4-mini";
-import { FluidapiCore } from "../core.js";
+import { SDKCore } from "../core.js";
 import { encodeBodyForm } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -11,7 +11,6 @@ import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
 import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
-import { FluidapiError } from "../models/errors/fluidapi-error.js";
 import {
   ConnectionError,
   InvalidRequestError,
@@ -21,6 +20,7 @@ import {
 } from "../models/errors/http-client-errors.js";
 import * as errors from "../models/errors/index.js";
 import { ResponseValidationError } from "../models/errors/response-validation-error.js";
+import { SDKError } from "../models/errors/sdk-error.js";
 import { SDKValidationError } from "../models/errors/sdk-validation-error.js";
 import * as models from "../models/index.js";
 import { APICall, APIPromise } from "../types/async.js";
@@ -39,14 +39,14 @@ import { Result } from "../types/fp.js";
  * @deprecated method: This will be removed in a future release, please migrate away from it as soon as possible.
  */
 export function tokensIssueFluidTokenLegacy(
-  client: FluidapiCore,
+  client: SDKCore,
   request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
     models.TokenData,
     | errors.OAuth2ErrorResponse
-    | FluidapiError
+    | SDKError
     | ResponseValidationError
     | ConnectionError
     | RequestAbortedError
@@ -64,7 +64,7 @@ export function tokensIssueFluidTokenLegacy(
 }
 
 async function $do(
-  client: FluidapiCore,
+  client: SDKCore,
   request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): Promise<
@@ -72,7 +72,7 @@ async function $do(
     Result<
       models.TokenData,
       | errors.OAuth2ErrorResponse
-      | FluidapiError
+      | SDKError
       | ResponseValidationError
       | ConnectionError
       | RequestAbortedError
@@ -157,7 +157,7 @@ async function $do(
   const [result] = await M.match<
     models.TokenData,
     | errors.OAuth2ErrorResponse
-    | FluidapiError
+    | SDKError
     | ResponseValidationError
     | ConnectionError
     | RequestAbortedError

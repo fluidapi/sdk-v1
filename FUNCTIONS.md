@@ -19,17 +19,17 @@ specific category of applications.
 ## Example
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { metadataHealthCheck } from "fluidapi/funcs/metadata-health-check.js";
+import { SDKCore } from "openapi/core.js";
+import { metadataHealthCheck } from "openapi/funcs/metadata-health-check.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await metadataHealthCheck(fluidapi);
+  const res = await metadataHealthCheck(sdk);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);

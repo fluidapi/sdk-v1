@@ -5,7 +5,7 @@ Invalid request parameters
 ## Example Usage
 
 ```typescript
-import { OAuth2ErrorResponse } from "fluidapi/models/errors";
+import { OAuth2ErrorResponse } from "openapi/models/errors";
 
 // No examples available for this model
 ```

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { SessionTokenData } from "fluidapi/models";
+import { SessionTokenData } from "openapi/models";
 
 let value: SessionTokenData = {
   accessToken: "<value>",

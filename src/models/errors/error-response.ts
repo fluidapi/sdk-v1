@@ -5,14 +5,14 @@
 import * as z from "zod/v4-mini";
 import * as types from "../../types/primitives.js";
 import * as models from "../index.js";
-import { FluidapiError } from "./fluidapi-error.js";
+import { SDKError } from "./sdk-error.js";
 
 export type ErrorResponseData = {
   ok: boolean;
   error: models.ErrorT;
 };
 
-export class ErrorResponse extends FluidapiError {
+export class ErrorResponse extends SDKError {
   ok: boolean;
   error: models.ErrorT;
 

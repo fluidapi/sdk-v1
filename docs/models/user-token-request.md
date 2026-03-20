@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { UserTokenRequest } from "fluidapi/models";
+import { UserTokenRequest } from "openapi/models";
 
 let value: UserTokenRequest = {
   externalId: "user-123",

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { JWKSet } from "fluidapi/models";
+import { JWKSet } from "openapi/models";
 
 let value: JWKSet = {
   keys: [],

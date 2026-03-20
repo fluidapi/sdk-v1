@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { SchemeBasicAuth } from "fluidapi/models";
+import { SchemeBasicAuth } from "openapi/models";
 
 let value: SchemeBasicAuth = {
   username: "",

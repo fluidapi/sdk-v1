@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ClientCredentialsRequest } from "fluidapi/models";
+import { ClientCredentialsRequest } from "openapi/models";
 
 let value: ClientCredentialsRequest = {
   grantType: "client_credentials",

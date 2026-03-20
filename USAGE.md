@@ -1,13 +1,13 @@
 <!-- Start SDK Example Usage [usage] -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.metadata.healthCheck();
+  const result = await sdk.metadata.healthCheck();
 
   console.log(result);
 }

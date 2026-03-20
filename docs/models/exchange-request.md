@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ExchangeRequest } from "fluidapi/models";
+import { ExchangeRequest } from "openapi/models";
 
 let value: ExchangeRequest = {
   token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO...",

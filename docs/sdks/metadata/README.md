@@ -17,14 +17,14 @@ Health check
 
 <!-- UsageSnippet language="typescript" operationID="healthCheck" method="get" path="/health" -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.metadata.healthCheck();
+  const result = await sdk.metadata.healthCheck();
 
   console.log(result);
 }
@@ -37,17 +37,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { metadataHealthCheck } from "fluidapi/funcs/metadata-health-check.js";
+import { SDKCore } from "openapi/core.js";
+import { metadataHealthCheck } from "openapi/funcs/metadata-health-check.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await metadataHealthCheck(fluidapi);
+  const res = await metadataHealthCheck(sdk);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);
@@ -73,10 +73,10 @@ run();
 
 ### Errors
 
-| Error Type                  | Status Code                 | Content Type                |
-| --------------------------- | --------------------------- | --------------------------- |
-| errors.ErrorResponse        | 503                         | application/json            |
-| errors.FluidapiDefaultError | 4XX, 5XX                    | \*/\*                       |
+| Error Type             | Status Code            | Content Type           |
+| ---------------------- | ---------------------- | ---------------------- |
+| errors.ErrorResponse   | 503                    | application/json       |
+| errors.SDKDefaultError | 4XX, 5XX               | \*/\*                  |
 
 ## getJwks
 
@@ -86,14 +86,14 @@ Returns the JWKS used to validate Fluid-signed JWTs.
 
 <!-- UsageSnippet language="typescript" operationID="getJWKS" method="get" path="/.well-known/jwks.json" -->
 ```typescript
-import { Fluidapi } from "fluidapi";
+import { SDK } from "openapi";
 
-const fluidapi = new Fluidapi({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDK({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await fluidapi.metadata.getJwks();
+  const result = await sdk.metadata.getJwks();
 
   console.log(result);
 }
@@ -106,17 +106,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { FluidapiCore } from "fluidapi/core.js";
-import { metadataGetJwks } from "fluidapi/funcs/metadata-get-jwks.js";
+import { SDKCore } from "openapi/core.js";
+import { metadataGetJwks } from "openapi/funcs/metadata-get-jwks.js";
 
-// Use `FluidapiCore` for best tree-shaking performance.
+// Use `SDKCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore({
-  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+const sdk = new SDKCore({
+  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const res = await metadataGetJwks(fluidapi);
+  const res = await metadataGetJwks(sdk);
   if (res.ok) {
     const { value: result } = res;
     console.log(result);
@@ -142,7 +142,7 @@ run();
 
 ### Errors
 
-| Error Type                  | Status Code                 | Content Type                |
-| --------------------------- | --------------------------- | --------------------------- |
-| errors.ErrorResponse        | 503                         | application/json            |
-| errors.FluidapiDefaultError | 4XX, 5XX                    | \*/\*                       |
+| Error Type             | Status Code            | Content Type           |
+| ---------------------- | ---------------------- | ---------------------- |
+| errors.ErrorResponse   | 503                    | application/json       |
+| errors.SDKDefaultError | 4XX, 5XX               | \*/\*                  |

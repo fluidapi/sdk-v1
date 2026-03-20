@@ -1,6 +1,6 @@
-# fluidapi Examples
+# openapi Examples
 
-This directory contains example scripts demonstrating how to use the fluidapi SDK.
+This directory contains example scripts demonstrating how to use the openapi SDK.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ This directory contains example scripts demonstrating how to use the fluidapi SD
    cp .env.template .env
    ```
 
-2. Edit `.env` and add your actual credentials (API keys, tokens, etc.)
+2. Edit `.env` and add your actual credentials
 
 ## Running the Examples
 

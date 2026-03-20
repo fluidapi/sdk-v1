@@ -8,9 +8,18 @@ sources:
             - location: .speakeasy/speakeasy-modifications-overlay.yaml
         registry:
             location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
+    combined:
+        inputs:
+            - location: ./public.yaml
+            - location: ./mock.yaml
+            - location: combined.yaml
+        output: out-combined
     mock:
         inputs:
             - location: ./mock.yaml
+        overlays:
+            - location: public.yaml
+        output: combined.yaml
 targets:
     fluidapi:
         target: typescript

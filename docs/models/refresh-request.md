@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { RefreshRequest } from "fluidapi/models";
+import { RefreshRequest } from "openapi/models";
 
 let value: RefreshRequest = {
   refreshToken: "ory_rt_...",

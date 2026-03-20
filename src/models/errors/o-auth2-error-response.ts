@@ -5,7 +5,7 @@
 import * as z from "zod/v4-mini";
 import { remap as remap$ } from "../../lib/primitives.js";
 import * as types from "../../types/primitives.js";
-import { FluidapiError } from "./fluidapi-error.js";
+import { SDKError } from "./sdk-error.js";
 
 /**
  * Invalid request parameters
@@ -24,7 +24,7 @@ export type OAuth2ErrorResponseData = {
 /**
  * Invalid request parameters
  */
-export class OAuth2ErrorResponse extends FluidapiError {
+export class OAuth2ErrorResponse extends SDKError {
   /**
    * OAuth2 error code (RFC 6749)
    */
