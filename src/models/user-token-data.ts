@@ -5,15 +5,32 @@
 import * as z from "zod/v4-mini";
 import { remap as remap$ } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
+import * as openEnums from "../types/enums.js";
+import { OpenEnum } from "../types/enums.js";
 import { Result as SafeParseResult } from "../types/fp.js";
 import * as types from "../types/primitives.js";
 import { SDKValidationError } from "./errors/sdk-validation-error.js";
 
+export const UserTokenDataTokenType = {
+  BearerMixed: "Bearer",
+  BearerLower: "bearer",
+} as const;
+export type UserTokenDataTokenType = OpenEnum<typeof UserTokenDataTokenType>;
+
 export type UserTokenData = {
   accessToken: string;
-  tokenType: string;
-  expiresIn?: number | undefined;
+  tokenType: UserTokenDataTokenType;
+  /**
+   * Effective token lifetime in seconds (always set; capped at server config)
+   */
+  expiresIn: number;
 };
+
+/** @internal */
+export const UserTokenDataTokenType$inboundSchema: z.ZodMiniType<
+  UserTokenDataTokenType,
+  unknown
+> = openEnums.inboundSchema(UserTokenDataTokenType);
 
 /** @internal */
 export const UserTokenData$inboundSchema: z.ZodMiniType<
@@ -22,8 +39,8 @@ export const UserTokenData$inboundSchema: z.ZodMiniType<
 > = z.pipe(
   z.object({
     access_token: types.string(),
-    token_type: types.string(),
-    expires_in: types.optional(types.number()),
+    token_type: UserTokenDataTokenType$inboundSchema,
+    expires_in: types.number(),
   }),
   z.transform((v) => {
     return remap$(v, {

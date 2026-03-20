@@ -24,7 +24,9 @@ import { metadataHealthCheck } from "fluidapi/funcs/metadata-health-check.js";
 
 // Use `FluidapiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const fluidapi = new FluidapiCore();
+const fluidapi = new FluidapiCore({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const res = await metadataHealthCheck(fluidapi);

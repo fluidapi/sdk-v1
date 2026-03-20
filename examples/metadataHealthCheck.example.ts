@@ -13,7 +13,9 @@ dotenv.config();
 
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi();
+const fluidapi = new Fluidapi({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
 
 async function main() {
   const result = await fluidapi.metadata.healthCheck();

@@ -6,5 +6,6 @@ export * from "./error-response.js";
 export * from "./fluidapi-default-error.js";
 export * from "./fluidapi-error.js";
 export * from "./http-client-errors.js";
+export * from "./o-auth2-error-response.js";
 export * from "./response-validation-error.js";
 export * from "./sdk-validation-error.js";

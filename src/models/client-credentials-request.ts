@@ -11,7 +11,7 @@ export const GrantType = {
 } as const;
 export type GrantType = ClosedEnum<typeof GrantType>;
 
-export type IssueTokenRequest = {
+export type ClientCredentialsRequest = {
   grantType: GrantType;
   clientId: string;
   clientSecret: string;
@@ -30,7 +30,7 @@ export const GrantType$outboundSchema: z.ZodMiniEnum<typeof GrantType> = z.enum(
 );
 
 /** @internal */
-export type IssueTokenRequest$Outbound = {
+export type ClientCredentialsRequest$Outbound = {
   grant_type: string;
   client_id: string;
   client_secret: string;
@@ -38,9 +38,9 @@ export type IssueTokenRequest$Outbound = {
 };
 
 /** @internal */
-export const IssueTokenRequest$outboundSchema: z.ZodMiniType<
-  IssueTokenRequest$Outbound,
-  IssueTokenRequest
+export const ClientCredentialsRequest$outboundSchema: z.ZodMiniType<
+  ClientCredentialsRequest$Outbound,
+  ClientCredentialsRequest
 > = z.pipe(
   z.object({
     grantType: GrantType$outboundSchema,
@@ -57,10 +57,10 @@ export const IssueTokenRequest$outboundSchema: z.ZodMiniType<
   }),
 );
 
-export function issueTokenRequestToJSON(
-  issueTokenRequest: IssueTokenRequest,
+export function clientCredentialsRequestToJSON(
+  clientCredentialsRequest: ClientCredentialsRequest,
 ): string {
   return JSON.stringify(
-    IssueTokenRequest$outboundSchema.parse(issueTokenRequest),
+    ClientCredentialsRequest$outboundSchema.parse(clientCredentialsRequest),
   );
 }

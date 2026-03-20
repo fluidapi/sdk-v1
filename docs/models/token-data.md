@@ -7,7 +7,7 @@ import { TokenData } from "fluidapi/models";
 
 let value: TokenData = {
   accessToken: "<value>",
-  tokenType: "bearer",
+  tokenType: "Bearer",
   expiresIn: 3600,
   scope: "fluid:api",
 };
@@ -15,9 +15,9 @@ let value: TokenData = {
 
 ## Fields
 
-| Field                                       | Type                                        | Required                                    | Description                                 | Example                                     |
-| ------------------------------------------- | ------------------------------------------- | ------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
-| `accessToken`                               | *string*                                    | :heavy_check_mark:                          | JWT access token                            |                                             |
-| `tokenType`                                 | [models.TokenType](../models/token-type.md) | :heavy_check_mark:                          | N/A                                         | bearer                                      |
-| `expiresIn`                                 | *number*                                    | :heavy_check_mark:                          | Token lifetime in seconds                   | 3600                                        |
-| `scope`                                     | *string*                                    | :heavy_check_mark:                          | Space-separated list of granted scopes      | fluid:api                                   |
+| Field                                                           | Type                                                            | Required                                                        | Description                                                     | Example                                                         |
+| --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| `accessToken`                                                   | *string*                                                        | :heavy_check_mark:                                              | JWT access token                                                |                                                                 |
+| `tokenType`                                                     | [models.TokenDataTokenType](../models/token-data-token-type.md) | :heavy_check_mark:                                              | N/A                                                             | Bearer                                                          |
+| `expiresIn`                                                     | *number*                                                        | :heavy_check_mark:                                              | Token lifetime in seconds                                       | 3600                                                            |
+| `scope`                                                         | *string*                                                        | :heavy_minus_sign:                                              | Space-separated list of granted scopes                          | fluid:api                                                       |

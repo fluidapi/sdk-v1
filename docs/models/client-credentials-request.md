@@ -1,11 +1,11 @@
-# IssueTokenRequest
+# ClientCredentialsRequest
 
 ## Example Usage
 
 ```typescript
-import { IssueTokenRequest } from "fluidapi/models";
+import { ClientCredentialsRequest } from "fluidapi/models";
 
-let value: IssueTokenRequest = {
+let value: ClientCredentialsRequest = {
   grantType: "client_credentials",
   clientId: "fld-cred-acme-corp--api--postman-primary",
   clientSecret: "dGhpcyBpcyBhIHNlY3JldA",

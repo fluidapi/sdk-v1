@@ -1,0 +1,494 @@
+openapi: "3.1.0"
+
+info:
+  title: Fluid Flowkit API — Public
+  description: |
+    Initial public contract for the client SDK bootstrap.
+
+    This first version documents the Flowkit activation operation based on the
+    provided cURL request and successful `201 Created` response.
+  version: "0.1.0"
+  contact:
+    name: Fluid API Team
+    email: api@fluidapi.com
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+
+servers:
+  - url: "{scheme}://{host}"
+    description: Configurable environment
+    variables:
+      scheme:
+        default: https
+        enum: [http, https]
+      host:
+        default: id.dev.api.fluidapi.io
+        enum:
+          - id.dev.api.fluidapi.io
+          - id.api.fluidapi.io
+          - localhost:9999
+
+tags:
+  - name: flowkits
+    description: Operations related to Flowkit lifecycle management.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /contaazul/v1/flowkits/activations:
+    post:
+      summary: Activate Flowkit
+      description: |
+        Activates a Flowkit for the Conta Azul integration using the provided
+        connector credentials and tenant/user context metadata.
+      operationId: activateFlowkit
+      tags: [flowkits]
+      parameters:
+        - name: key
+          in: query
+          required: true
+          description: Activation key used to authorize the Flowkit activation.
+          schema:
+            type: string
+            format: uuid
+            example: dab7e862-5899-4993-b50b-2fe8c4535b8e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateFlowkitRequest"
+            example:
+              credentials:
+                url: https://1225878.commercesuite.com.br
+                code: 504c234370fd5bc6224ad99e154c039fbecbd9d893fajsdoi78y87sdysj9sdd
+              data:
+                identifier: loja01
+                x-tenantId: "3363001"
+                x-userId: "58139234"
+                x-email: 1d46cf93-68c7-4106-345s-43f147ecdd67@devportal.com
+      responses:
+        "201":
+          description: Flowkit activation accepted and resource created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowkitActivation"
+              example:
+                audit:
+                  created:
+                    timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                    user_id: bc32c03a-e885-4641-aaac-ca9358703d07
+                  update_history:
+                    - timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                      user_id: bc32c03a-e885-4641-aaac-ca9358703d07
+                  updated:
+                    timestamp: "2026-03-19T19:11:22.841037415-03:00"
+                    user_id: bc32c03a-e885-4641-aaac-ca9358703d07
+                connectors:
+                  - contaazulprivado
+                  - tray
+                description: descricao do flowkit
+                flowkit_name: conta-azul-tray-2
+                flowkit_revision: 1.0.0
+                id: 9074bd4d-23e0-11f1-b769-4e4d4c5f610c
+                identifier: loja06
+                published: true
+                status: in_progress
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      summary: List active Flowkits
+      description: |
+        Returns the currently activated Flowkits.
+
+        This operation is currently documented with a mock response so the SDK
+        can be generated and consumed by the client team before the final API
+        contract is available.
+      operationId: listFlowkitActivations
+      tags: [flowkits]
+      responses:
+        "200":
+          description: Activated Flowkits returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListFlowkitActivationsResponse"
+              example:
+                data:
+                  data:
+                    - __typename: FlowKitActivatedResponse
+                      activations: 1
+                      audit:
+                        created:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:54:41.103Z"
+                        updated:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:54:41.103Z"
+                      connectors:
+                        - linx-commerce
+                        - fluid-flow
+                        - storage
+                        - http
+                      flowkit_name: bling-linx
+                      flowkit_revision: 1.0.7
+                      flows: 4
+                      id: bling-linx-1.0.7
+                      identifier: flowkit-test-test
+                      status: success
+                    - __typename: FlowKitActivatedResponse
+                      activations: 1
+                      audit:
+                        created:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:52:36.553Z"
+                        updated:
+                          first_name: Luigi
+                          last_name: da Silva
+                          timestamp: "2026-02-27T14:52:36.553Z"
+                      connectors:
+                        - flexy
+                        - bling
+                      flowkit_name: bling-flexy
+                      flowkit_revision: 1.0.0
+                      flows: 2
+                      id: bling-flexy-1.0.0
+                      identifier: flowkit-test-ativaca
+                      status: success
+                  total:
+                    __typename: Meta
+                    count: 13
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /contaazul/v1/flowkits/activations/{activationId}:
+    delete:
+      summary: Delete Flowkit activation
+      description: |
+        Deletes an activated Flowkit by its activation identifier.
+
+        This operation is currently scaffolded for SDK generation and uses a
+        mock success response.
+      operationId: deleteFlowkitActivation
+      tags: [flowkits]
+      parameters:
+        - name: activationId
+          in: path
+          required: true
+          description: Identifier of the activated Flowkit to delete.
+          schema:
+            type: string
+            example: bling-linx-1.0.7
+      responses:
+        "200":
+          description: Flowkit activation deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteFlowkitActivationResponse"
+              example:
+                data:
+                  deleted: true
+                  id: bling-linx-1.0.7
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ActivateFlowkitRequest:
+      type: object
+      required: [credentials, data]
+      properties:
+        credentials:
+          $ref: "#/components/schemas/FlowkitCredentials"
+        data:
+          $ref: "#/components/schemas/FlowkitActivationContext"
+
+    FlowkitCredentials:
+      type: object
+      required: [url, code]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Base URL for the connected commerce platform.
+          example: https://1225878.commercesuite.com.br
+        code:
+          type: string
+          description: Integration credential code/token.
+          example: 504c234370fd5bc6224ad99e154c039fbecbd9d893fajsdoi78y87sdysj9sdd
+
+    FlowkitActivationContext:
+      type: object
+      required: [identifier, x-tenantId, x-userId, x-email]
+      properties:
+        identifier:
+          type: string
+          description: Client-side identifier for the activated Flowkit.
+          example: loja01
+        x-tenantId:
+          type: string
+          description: Tenant identifier propagated to the integration context.
+          example: "3363001"
+        x-userId:
+          type: string
+          description: User identifier propagated to the integration context.
+          example: "58139234"
+        x-email:
+          type: string
+          format: email
+          description: User email propagated to the integration context.
+          example: cliente@devportal.com
+
+    FlowkitActivation:
+      type: object
+      required:
+        - audit
+        - connectors
+        - description
+        - flowkit_name
+        - flowkit_revision
+        - id
+        - identifier
+        - published
+        - status
+      properties:
+        audit:
+          $ref: "#/components/schemas/AuditMetadata"
+        connectors:
+          type: array
+          items:
+            type: string
+          example:
+            - contaazulprivado
+            - tray
+        description:
+          type: string
+          example: descricao do flowkit
+        flowkit_name:
+          type: string
+          example: conta-azul-tray-2
+        flowkit_revision:
+          type: string
+          example: 1.0.0
+        id:
+          type: string
+          format: uuid
+          example: 9074bd4d-23e0-11f1-b769-4e4d4c5f610c
+        identifier:
+          type: string
+          example: loja06
+        published:
+          type: boolean
+          example: true
+        status:
+          type: string
+          example: in_progress
+
+    AuditMetadata:
+      type: object
+      required: [created, update_history, updated]
+      properties:
+        created:
+          $ref: "#/components/schemas/AuditEntry"
+        update_history:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEntry"
+        updated:
+          $ref: "#/components/schemas/AuditEntry"
+
+    AuditEntry:
+      type: object
+      required: [timestamp, user_id]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-03-19T19:11:22.841037415-03:00"
+        user_id:
+          type: string
+          format: uuid
+          example: bc32c03a-e885-4641-aaac-ca9358703d07
+
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          example: unexpected error
+
+    ListFlowkitActivationsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowkitActivationListEnvelope"
+
+    FlowkitActivationListEnvelope:
+      type: object
+      required: [data, total]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowkitActivatedItem"
+        total:
+          $ref: "#/components/schemas/MetaCount"
+
+    FlowkitActivatedItem:
+      type: object
+      required:
+        - __typename
+        - activations
+        - audit
+        - connectors
+        - flowkit_name
+        - flowkit_revision
+        - flows
+        - id
+        - identifier
+        - status
+      properties:
+        __typename:
+          type: string
+          example: FlowKitActivatedResponse
+        activations:
+          type: integer
+          example: 1
+        audit:
+          $ref: "#/components/schemas/FlowkitUserAudit"
+        connectors:
+          type: array
+          items:
+            type: string
+        flowkit_name:
+          type: string
+          example: bling-linx
+        flowkit_revision:
+          type: string
+          example: 1.0.7
+        flows:
+          type: integer
+          example: 4
+        id:
+          type: string
+          example: bling-linx-1.0.7
+        identifier:
+          type: string
+          example: flowkit-test-test
+        status:
+          type: string
+          example: success
+
+    FlowkitUserAudit:
+      type: object
+      required: [created, updated]
+      properties:
+        created:
+          $ref: "#/components/schemas/FlowkitUserAuditEntry"
+        updated:
+          $ref: "#/components/schemas/FlowkitUserAuditEntry"
+
+    FlowkitUserAuditEntry:
+      type: object
+      required: [first_name, last_name, timestamp]
+      properties:
+        first_name:
+          type: string
+          example: Luigi
+        last_name:
+          type: string
+          example: da Silva
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-02-27T14:54:41.103Z"
+
+    MetaCount:
+      type: object
+      required: [__typename, count]
+      properties:
+        __typename:
+          type: string
+          example: Meta
+        count:
+          type: integer
+          example: 13
+
+    DeleteFlowkitActivationResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [deleted, id]
+          properties:
+            deleted:
+              type: boolean
+              example: true
+            id:
+              type: string
+              example: bling-linx-1.0.7
+
+  responses:
+    BadRequest:
+      description: Invalid request payload or query parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            message: invalid request
+
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            message: unauthorized
+
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            message: internal server error
+
+    NotFound:
+      description: Requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            message: flowkit activation not found

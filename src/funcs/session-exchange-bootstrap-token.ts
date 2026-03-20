@@ -9,6 +9,7 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
+import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import { FluidapiError } from "../models/errors/fluidapi-error.js";
 import {
@@ -22,42 +23,31 @@ import * as errors from "../models/errors/index.js";
 import { ResponseValidationError } from "../models/errors/response-validation-error.js";
 import { SDKValidationError } from "../models/errors/sdk-validation-error.js";
 import * as models from "../models/index.js";
-import * as operations from "../models/operations/index.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Issue end-user token
+ * Exchange bootstrap token for user session
  *
  * @remarks
- * Issues a JWT for an end user (workspace user or customer user).
+ * Exchanges the short-lived bootstrap JWT issued by `POST /users/token` for a
+ * Hydra-managed session token pair (`access_token` + `refresh_token`).
  *
- * Supported authentication modes:
- * - `Authorization: Bearer <m2m_token>` — preferred. The token must be a
- *   Fluid-signed M2M JWT with `scope` including `fluid:api`.
- *   Canonical first-access provisioning via external lookup/create is only
- *   available in this mode.
- * - HTTP Basic Auth with `client_id` + `client_secret`.
- *   In this mode the service does not perform canonical lookup/create.
+ * The bootstrap token is **single-use**: a second call with the same token
+ * returns `401 invalid_grant`. Claims from the bootstrap token (workspace_id,
+ * tenant_id, user_id, etc.) are forwarded into the Hydra session via the
+ * server-side authorization code flow.
  *
- * If `customer_external_id` is present, the JWT is issued with `scope: customer`.
- * Otherwise it is issued with `scope: workspace`.
- *
- * When canonical first-access provisioning is enabled, `email` is required
- * so the service can lookup or create the canonical user before issuing the token.
- *
- * When canonical provisioning is disabled by server configuration, the
- * service may materialize local IAM context by assuming `external_id` is
- * already the canonical `user_id`.
+ * The resulting `refresh_token` can be renewed via `POST /users/token/refresh`.
  */
-export function tokensIssueUserToken(
+export function sessionExchangeBootstrapToken(
   client: FluidapiCore,
-  request: models.UserTokenRequest,
+  request: models.ExchangeRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    operations.IssueUserTokenResponse,
-    | errors.ErrorResponse
+    models.SessionTokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -77,13 +67,13 @@ export function tokensIssueUserToken(
 
 async function $do(
   client: FluidapiCore,
-  request: models.UserTokenRequest,
+  request: models.ExchangeRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      operations.IssueUserTokenResponse,
-      | errors.ErrorResponse
+      models.SessionTokenData,
+      | errors.OAuth2ErrorResponse
       | FluidapiError
       | ResponseValidationError
       | ConnectionError
@@ -98,7 +88,7 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => z.parse(models.UserTokenRequest$outboundSchema, value),
+    (value) => z.parse(models.ExchangeRequest$outboundSchema, value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -107,22 +97,26 @@ async function $do(
   const payload = parsed.value;
   const body = encodeJSON("body", payload, { explode: true });
 
-  const path = pathToFunc("/users/token")();
+  const path = pathToFunc("/users/token/exchange")();
 
   const headers = new Headers(compactMap({
     "Content-Type": "application/json",
     Accept: "application/json",
   }));
 
+  const secConfig = await extractSecurity(client._options.bearerAuth);
+  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
+  const requestSecurity = resolveGlobalSecurity(securityInput);
+
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "issueUserToken",
+    operationID: "exchangeBootstrapToken",
     oAuth2Scopes: null,
 
-    resolvedSecurity: null,
+    resolvedSecurity: requestSecurity,
 
-    securitySource: null,
+    securitySource: client._options.bearerAuth,
     retryConfig: options?.retries
       || client._options.retryConfig
       || { strategy: "none" },
@@ -130,6 +124,7 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
+    security: requestSecurity,
     method: "POST",
     baseURL: options?.serverURL,
     path: path,
@@ -145,7 +140,7 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["400", "401", "403", "404", "409", "4XX", "502", "5XX"],
+    errorCodes: ["400", "401", "4XX", "502", "5XX"],
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });
@@ -159,8 +154,8 @@ async function $do(
   };
 
   const [result] = await M.match<
-    operations.IssueUserTokenResponse,
-    | errors.ErrorResponse
+    models.SessionTokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -170,9 +165,9 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, operations.IssueUserTokenResponse$inboundSchema),
-    M.jsonErr([400, 401, 403, 404, 409], errors.ErrorResponse$inboundSchema),
-    M.jsonErr(502, errors.ErrorResponse$inboundSchema),
+    M.json(200, models.SessionTokenData$inboundSchema),
+    M.jsonErr([400, 401], errors.OAuth2ErrorResponse$inboundSchema),
+    M.jsonErr(502, errors.OAuth2ErrorResponse$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

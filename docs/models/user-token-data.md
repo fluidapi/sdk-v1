@@ -8,14 +8,14 @@ import { UserTokenData } from "fluidapi/models";
 let value: UserTokenData = {
   accessToken: "<value>",
   tokenType: "Bearer",
-  expiresIn: 3600,
+  expiresIn: 300,
 };
 ```
 
 ## Fields
 
-| Field              | Type               | Required           | Description        | Example            |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| `accessToken`      | *string*           | :heavy_check_mark: | N/A                |                    |
-| `tokenType`        | *string*           | :heavy_check_mark: | N/A                | Bearer             |
-| `expiresIn`        | *number*           | :heavy_minus_sign: | N/A                | 3600               |
+| Field                                                                     | Type                                                                      | Required                                                                  | Description                                                               | Example                                                                   |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `accessToken`                                                             | *string*                                                                  | :heavy_check_mark:                                                        | N/A                                                                       |                                                                           |
+| `tokenType`                                                               | [models.UserTokenDataTokenType](../models/user-token-data-token-type.md)  | :heavy_check_mark:                                                        | N/A                                                                       | Bearer                                                                    |
+| `expiresIn`                                                               | *number*                                                                  | :heavy_check_mark:                                                        | Effective token lifetime in seconds (always set; capped at server config) | 300                                                                       |

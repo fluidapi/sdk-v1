@@ -1,9 +1,9 @@
-speakeasyVersion: 1.755.0
+speakeasyVersion: 1.758.0
 sources:
     auth:
         sourceNamespace: auth
-        sourceRevisionDigest: sha256:3e20ccecb3628340bff36b2203493995491e30b9013aa28a7426018364c96ec4
-        sourceBlobDigest: sha256:8090e304a1e7b9cda9e47561d324c2828aeedcf4ad5d0f1931d8ea0aabd64bda
+        sourceRevisionDigest: sha256:2c844654b2fa9a732bca91bf5ae7c6814a70c22b11fe4f4acc98bc3bcd751b72
+        sourceBlobDigest: sha256:311dff8e1c47a02e48fcf40e11b9451df16c66ce5d6ea8e4a5ea469e30fc76e5
         tags:
             - latest
             - 1.0.0
@@ -11,17 +11,22 @@ targets:
     fluidapi:
         source: auth
         sourceNamespace: auth
-        sourceRevisionDigest: sha256:3e20ccecb3628340bff36b2203493995491e30b9013aa28a7426018364c96ec4
-        sourceBlobDigest: sha256:8090e304a1e7b9cda9e47561d324c2828aeedcf4ad5d0f1931d8ea0aabd64bda
+        sourceRevisionDigest: sha256:2c844654b2fa9a732bca91bf5ae7c6814a70c22b11fe4f4acc98bc3bcd751b72
+        sourceBlobDigest: sha256:311dff8e1c47a02e48fcf40e11b9451df16c66ce5d6ea8e4a5ea469e30fc76e5
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
     sources:
         auth:
             inputs:
-                - location: ../public.yaml
+                - location: ./public.yaml
+            overlays:
+                - location: .speakeasy/speakeasy-modifications-overlay.yaml
             registry:
                 location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
+        mock:
+            inputs:
+                - location: ./mock.yaml
     targets:
         fluidapi:
             target: typescript

@@ -1,28 +1,33 @@
 lockVersion: 2.0.0
 id: ea5fbe8b-a5b0-42cf-823d-f40f6781edf4
 management:
-  docChecksum: 80154aac1d1b6409ae755c67777da551
+  docChecksum: 5137dc7ba01548e499191513a8f509b6
   docVersion: 1.0.0
-  speakeasyVersion: 1.755.0
-  generationVersion: 2.865.2
-  releaseVersion: 0.0.3
-  configChecksum: 48e000c55971377bad0fcdd760e5776c
+  speakeasyVersion: 1.758.0
+  generationVersion: 2.866.2
+  releaseVersion: 0.2.0
+  configChecksum: 09166ffee9bb9bf24beb86ea0275c425
   published: true
 persistentEdits:
-  generation_id: 26738a6f-55a8-4ddd-a3ca-aa3453e70731
-  pristine_commit_hash: 2f1216823a47d40e289666e84c7fa3857a8b717e
-  pristine_tree_hash: 5082ef146af008b995b65fbca7de0876d88ed3e1
+  generation_id: 023613b4-8a5d-46ab-ac78-da475b88b788
+  pristine_commit_hash: a075b9690ec8365470af51af9d5049f789c42115
+  pristine_tree_hash: 65d01be96e3621e8fda8865158da2f1039477db1
 features:
   typescript:
     additionalDependencies: 0.1.0
     core: 3.26.42
     defaultEnabledRetries: 0.1.0
+    deprecations: 2.81.1
     devContainers: 2.90.1
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
+    globalSecurity: 2.82.15
     globalSecurityCallbacks: 0.1.0
+    globalSecurityFlattening: 0.1.1
     globalServerURLs: 2.83.1
     methodArguments: 0.1.2
+    methodSecurity: 2.82.8
+    nameOverrides: 2.81.4
     responseFormat: 0.3.0
     retries: 2.83.0
     sdkHooks: 0.4.0
@@ -53,20 +58,24 @@ trackedFiles:
     pristine_git_object: 6ee2921010070a544e252596defc55d501e1c1ae
   FUNCTIONS.md:
     id: 21b9df02aaeb
-    last_write_checksum: sha1:b89c3e2259032b12b8e801584a9375fb744e19c9
-    pristine_git_object: 306e63a95b57aac0b84f4b07a58b587ab3d866a1
+    last_write_checksum: sha1:acff1c042938262e864ad177eec4fb1d894fbc4b
+    pristine_git_object: 5cad18885b75176eede7633e742919162d2a0263
   RUNTIMES.md:
     id: 620c490847b6
     last_write_checksum: sha1:e45b854f02c357cbcfdb8c3663000e8339e16505
     pristine_git_object: 27731c3b5ace66bedc454ed5acbe15075aacd3dc
   USAGE.md:
     id: 3aed33ce6e6f
-    last_write_checksum: sha1:06d712c6177826d0564725a0dd3297bf6cef0753
-    pristine_git_object: 235ffbe352b39d8ea0153b585d93488bdf1536f3
+    last_write_checksum: sha1:ac06130a4538f7480384d1fb53a41176aa0b4482
+    pristine_git_object: 715130ec8bd179dd6961d2ebbe6a1207b1657134
   docs/lib/utils/retryconfig.md:
     id: 0ce9707cb848
     last_write_checksum: sha1:bc4454e196fcd219f5a78da690375a884f5ed07b
     pristine_git_object: 08f95f4552349360b2c0b01802aa71ec3a55d2c2
+  docs/models/client-credentials-request.md:
+    id: b9b1d8344414
+    last_write_checksum: sha1:f66cdfddb2a09afa713d7e7403fca7af1620cea4
+    pristine_git_object: cd98fa86eb45f2759eb912f569578b07ae640667
   docs/models/error-t.md:
     id: 7fb5e56408dd
     last_write_checksum: sha1:cab0485ac0d892835915a26863d491ae6a848664
@@ -75,6 +84,14 @@ trackedFiles:
     id: 42d2f6b1c814
     last_write_checksum: sha1:eab9d2d3186525ea24a4563aaf76847aa2ad8744
     pristine_git_object: 552fba878e13fec58f5402a0f0410b96d04fe752
+  docs/models/errors/o-auth2-error-response.md:
+    id: eb6fd064bbcd
+    last_write_checksum: sha1:1379947e8f0d109737ed08c372b55825327cd09c
+    pristine_git_object: 3fea15e54d7d15bb7f7eca47eaa84aae3e8885c9
+  docs/models/exchange-request.md:
+    id: fa661d257731
+    last_write_checksum: sha1:80abc9ac86cd463ad5efb4294b295d03b1ca947a
+    pristine_git_object: 7dba94c3b407462bf2c4d6a87b790d2471a60544
   docs/models/grant-type.md:
     id: a09bc9d7d8fe
     last_write_checksum: sha1:aa44cd03007dd8e66dd37a4d665b2b3185908acb
@@ -83,10 +100,6 @@ trackedFiles:
     id: 76ea3fbe6d66
     last_write_checksum: sha1:0bac40fd5fee300334edbd5ce4de50a23e226c1b
     pristine_git_object: 3d82c842a8cd7c48616421a4821b5055a08f5da1
-  docs/models/issue-token-request.md:
-    id: 753cf08f16ce
-    last_write_checksum: sha1:1aaf4304f59ec49dda4aecc2044d99e601069229
-    pristine_git_object: 58161f2c5993b5328d4e2b4fcc9a2b5213be1ce3
   docs/models/jwk-set.md:
     id: b796a0f6b2ad
     last_write_checksum: sha1:756ff8019a899fd334d1297fd1025be60fee282e
@@ -95,90 +108,118 @@ trackedFiles:
     id: 17f8e89e0113
     last_write_checksum: sha1:2d3fbe98ea12d98f29fca5aa1f61c210c52a8482
     pristine_git_object: f476fb3a819cb442e1db5d97060fa3c33280afec
-  docs/models/operations/issue-fluid-token-response.md:
-    id: 42a4ae0652ad
-    last_write_checksum: sha1:abaea857af1d7b93754da6f5ca100189f9da6b54
-    pristine_git_object: f89a40a014ceede610731c5ef78dccd7611ee6d7
-  docs/models/operations/issue-token-response.md:
-    id: d03be69f144b
-    last_write_checksum: sha1:fac23b0ca82455e5ac3d8abac897d1301cac2fad
-    pristine_git_object: 7728db91ff497952dc3bd261a8671662f744d577
-  docs/models/operations/issue-user-token-response.md:
-    id: 1452461c01be
-    last_write_checksum: sha1:0951d0409365c61a2f17c8b6636160c45054c6be
-    pristine_git_object: a571bb2c46532fe2c454e15d1560d2fad28cefc7
+  docs/models/operations/issue-user-token-security.md:
+    id: 4a4123607793
+    last_write_checksum: sha1:01d076cc2a9e90f4db9ad986c9bb82c146b9d242
+    pristine_git_object: fa5b7d0adfee4e41ef8541b9a92dc0122c9480e8
+  docs/models/refresh-request.md:
+    id: 42ba0a2cba72
+    last_write_checksum: sha1:1faf7e64b911be6370e132b0843836e8d012049a
+    pristine_git_object: ec18bfc8b8095662e490e7cb57a614ea1b3f7e3c
+  docs/models/scheme-basic-auth.md:
+    id: 3a38199b802f
+    last_write_checksum: sha1:aca24eb406a2a65eadd4e5d4a6a5e5238f1d054d
+    pristine_git_object: a263b7f27ff994cef4cb8e51c1a8d2a99d335322
+  docs/models/security.md:
+    id: 452e4d4eb67a
+    last_write_checksum: sha1:b5c7b3aa8a1929c0c7a0f05fcdad15ba911a8afe
+    pristine_git_object: b5f56110802886547aebc32f97e5df1ad8363b28
+  docs/models/session-token-data-token-type.md:
+    id: 22beded5f133
+    last_write_checksum: sha1:57dd7401e0d591227815cba63e0fecf4721de5e2
+    pristine_git_object: da8a17a04e8b1b1f7fd070076eb048afa74d15a5
+  docs/models/session-token-data.md:
+    id: 8e71c94bdeab
+    last_write_checksum: sha1:225f96e27a544b949cfef2523a305e94853fd5df
+    pristine_git_object: df7743d3071ece2920f5600bba611a9443dbcbc2
+  docs/models/token-data-token-type.md:
+    id: 3bee1d4100a8
+    last_write_checksum: sha1:ea074c0fc5dd72bdf8ad14b69ab6f3c6f9ac6c21
+    pristine_git_object: 02d0a559c5ffbee8da676ec16d9a0fa2bed0892e
   docs/models/token-data.md:
     id: 06c3b8c64768
-    last_write_checksum: sha1:f3dcf95482e7c42dae166cf878b8dde4cd16c76b
-    pristine_git_object: 75607a09a55e9ac1c3ccec7783a026cba6aadd06
-  docs/models/token-type.md:
-    id: 778af22c5237
-    last_write_checksum: sha1:e80d811238ce364558b856f23b1fbdb887fbd403
-    pristine_git_object: 6ec91593712d8b293c15e9758d85750c81f5c14d
+    last_write_checksum: sha1:8173d74adb004e6b392df424d51a0a21b9f52112
+    pristine_git_object: a77711412d4993c2eef49a2df9a25133940375dd
+  docs/models/user-token-data-token-type.md:
+    id: d0b9af44f3fd
+    last_write_checksum: sha1:1fe2f7e7e14df4a8eb47273e0b127fe9b75cddb9
+    pristine_git_object: 6fd03885821e21dfde8ff0cecbef0be1535605c4
   docs/models/user-token-data.md:
     id: 64eaa66db31b
-    last_write_checksum: sha1:829ab55d3abab948d28fd8c3d61219a42bb0bffe
-    pristine_git_object: 0889b1903800fbbc76e8717b2ea6fd2d80e3c7af
+    last_write_checksum: sha1:4e7d6b8a71d1565a47fb91c0d4246306a1d3bffa
+    pristine_git_object: 0681e9105819916bd0901a488d60c9f0931d5748
   docs/models/user-token-request.md:
     id: 0715f45df2ed
-    last_write_checksum: sha1:cc9bf44995fafa6f19d1501bf5ce061324f91275
-    pristine_git_object: dd4c4a616020f25806b4c61013999b25c34d3898
+    last_write_checksum: sha1:89d8a115e397e4b43fd8d48cbd8cced9ebad76ce
+    pristine_git_object: 03fba74deec8e1d2a0e3022f756eeff9ed143b63
   docs/sdks/metadata/README.md:
     id: de871ca7dbeb
-    last_write_checksum: sha1:c671d43ad1ab91848e144fbf9d155c17bd74f784
-    pristine_git_object: d28e845b72e91725d6a7bc03d9825be024ee0e42
+    last_write_checksum: sha1:148fc26e8a5bcfc4cead4389ed6a45416e7dde5c
+    pristine_git_object: 29fda62a37760e57362459159c50d48b67514137
+  docs/sdks/session/README.md:
+    id: 5ea5090b3849
+    last_write_checksum: sha1:7d4d262d008e49c5e94cdf28e98290a194988ac3
+    pristine_git_object: e1786826dc3c7b9dfdc3c5960d347fddf4cc7cfb
   docs/sdks/tokens/README.md:
     id: ca61030eb3e5
-    last_write_checksum: sha1:9ffd95752997c0ac84e9193f1569d1f272d23291
-    pristine_git_object: 4a8b1eb81a0baa575941db87af2f19a970080a48
+    last_write_checksum: sha1:7ed3869fca9c4d67d6cc0b792e43b9e7bf7ea96b
+    pristine_git_object: 23940e1f164233c01619755d4d0c5e24c4104563
   examples/.env.template:
     id: 52cbe5afed92
-    last_write_checksum: sha1:d806a285f75e36b151617ffe97e5909a570ed06a
-    pristine_git_object: 46a5a969c11df923071f2728a24adcf225007ebd
+    last_write_checksum: sha1:deb627bfe41137aaed2578df90142b2c074b4e0a
+    pristine_git_object: ecaaf293f06878f72f0d97b2d8823f3953c752ac
   examples/README.md:
     id: 9d0f69d6e677
     last_write_checksum: sha1:1d1ee6a43b072cd20f8bf779dc5dd0f57ab2fa70
     pristine_git_object: b4a721bfdf30c839a395742ac54097f449e1ccfe
   examples/metadataHealthCheck.example.ts:
     id: 82abe505c604
-    last_write_checksum: sha1:593983c6dcb0603a9d400e113dbdb0f816b3ab28
-    pristine_git_object: 8cdf81f764a642025bfa633467acfeec6acb15b7
+    last_write_checksum: sha1:07acf39ed2021fb03a74a36584f847a676bf07cd
+    pristine_git_object: b3035b4fafb7acb523df788a303ccb683d05da93
   examples/package.json:
     id: c1d7b0ec8e7e
     last_write_checksum: sha1:b83c4aa557aa3c46834b425c9a15bf2c8050e4dd
     pristine_git_object: 3a4ca1a9711e373c29e62d70b5f3d7e371105ddd
   jsr.json:
     id: 7f6ab7767282
-    last_write_checksum: sha1:9eff6ed78e5f2bff561e6dc948ce38b1077a30e9
-    pristine_git_object: bfe0849fc4d99a4b36e3477db1c376e0ed7ec144
+    last_write_checksum: sha1:56dbd9f210434384f6e99b3562732c3370240657
+    pristine_git_object: 3b03b3ca0c9685595774c302cac4ea8e69e87d7f
   package.json:
     id: 7030d0b2f71b
-    last_write_checksum: sha1:1451ccd0b8ed333ba05d4020dfc65aa7c1ac8cb5
-    pristine_git_object: bfba5475f7faf3fdafbff3f414d8c73a700c631a
+    last_write_checksum: sha1:b3b4dbc646f80e30f81e6834cc83a4c4dda96c7d
+    pristine_git_object: b72106e97b94c1d199316a450e11ba1ae13bccbe
   src/core.ts:
     id: f431fdbcd144
     last_write_checksum: sha1:b0d5cbecb7122a60383c9aff9582667ec3f2e367
     pristine_git_object: a4ac26c6ec2752c713b3fff0d480f4cabad522fe
   src/funcs/metadata-get-jwks.ts:
     id: 3874e9eeae64
-    last_write_checksum: sha1:cd656fbc1d6402698c8e3d11a36044baafc105dc
-    pristine_git_object: 19765ab3ab0e9583eeee2ddc1690f457a5a02612
+    last_write_checksum: sha1:de0439346ec270614d3475b8eeddfc3ab6aa530e
+    pristine_git_object: 2b4c8a7235111cdfc346d0761efa17ea9dd1430c
   src/funcs/metadata-health-check.ts:
     id: ce99e23a82d2
-    last_write_checksum: sha1:325ddbd635927c2b857014d475b18bad48a9ff7f
-    pristine_git_object: 7568000c9284ceb110389e0beea5aed496d82a3b
-  src/funcs/tokens-issue-fluid-token.ts:
-    id: b01724b9bfc7
-    last_write_checksum: sha1:694ce6a65c4c1a333948d80e6841868c648e58ac
-    pristine_git_object: f6de97390c855fe7f8d3efc4c643d42b69706576
-  src/funcs/tokens-issue-token.ts:
-    id: 848825a13f30
-    last_write_checksum: sha1:6953323335404178ede7958f8198c4f10b5cbb92
-    pristine_git_object: aa091c7218b84cca17268ac2c32ffe4608416c49
-  src/funcs/tokens-issue-user-token.ts:
-    id: 4f3a595199d7
-    last_write_checksum: sha1:637652fd0e282ee05bc8b39e37eb0c67b7b71db8
-    pristine_git_object: bf4985be1b832058edfa278d5fe8380ac6066faf
+    last_write_checksum: sha1:b4b50771ad8ce647407e213010217b9e385abc69
+    pristine_git_object: e083f498d222341da40bfa126b97ef215d1fa4ed
+  src/funcs/session-exchange-bootstrap-token.ts:
+    id: d611f55243df
+    last_write_checksum: sha1:6114b2a8b1083aac97599add44b08e6a758d46b1
+    pristine_git_object: ae7b5b6253d06fa554275e44c103ef6b0635eedb
+  src/funcs/session-refresh-user-session.ts:
+    id: 2d78a3f2665f
+    last_write_checksum: sha1:4b541c639fe1f05fd91724276377a60b8ed470f3
+    pristine_git_object: d8a3c78e0720cee97992768f98227523ef70c89f
+  src/funcs/tokens-issue-fluid-token-legacy.ts:
+    id: 5b7bd95f0186
+    last_write_checksum: sha1:6dd81a488639badd3a37ef63e0f70aacce01adf7
+    pristine_git_object: b1e2c377aa1c1891750d5e0317618781e7cbe561
+  src/funcs/tokens-issue-user.ts:
+    id: a725f41d3893
+    last_write_checksum: sha1:933ed6feeb4bb47d8276b2217bfcb82a80717b53
+    pristine_git_object: ec8e3b46c2e45a53e6c745e7adda247629a83942
+  src/funcs/tokens-issue.ts:
+    id: f98a64eda949
+    last_write_checksum: sha1:0ac6939ee1e07599be54d59c7e239df5e15d2200
+    pristine_git_object: 03f6dcf95279bd6a88f29968079400a3efe67299
   src/hooks/hooks.ts:
     id: a2463fc6f69b
     last_write_checksum: sha1:7dd975bbcc46a32dd394f86a4652b74ecc70d874
@@ -201,8 +242,8 @@ trackedFiles:
     pristine_git_object: 44be0eae8246521b230e8e711a88eff738fc015d
   src/lib/config.ts:
     id: 320761608fb3
-    last_write_checksum: sha1:30d15a111bb2b568ebd2388a4ae865f7472ef83b
-    pristine_git_object: 177ff8b80f2a5b876031cc4dd2361c4f683be070
+    last_write_checksum: sha1:b5988b757c2cb58fc394542519a6da73f6c093a7
+    pristine_git_object: d84ba1686438a4ad7dd5cb3d77d238b3c50f334f
   src/lib/dlv.ts:
     id: b1988214835a
     last_write_checksum: sha1:1dd3e3fbb4550c4bf31f5ef997faff355d6f3250
@@ -213,12 +254,12 @@ trackedFiles:
     pristine_git_object: 25d1d8032a69f56da1ac1df00a48ecf73457a1ef
   src/lib/env.ts:
     id: c52972a3b198
-    last_write_checksum: sha1:7e31b64ec180e3e762d0b1deaae86c5520bfbc8e
-    pristine_git_object: 7569680ac15b2f05cdb1891c3e3894670318b6c4
+    last_write_checksum: sha1:2bc8486c2afedaa8c32d242bb0571d8ed0688d46
+    pristine_git_object: b2e3bca632d765a833214e838bbba1992b071368
   src/lib/files.ts:
     id: e5efa54fcb95
-    last_write_checksum: sha1:d0f325f445b8d22e7d73baf052c585ec2dd24841
-    pristine_git_object: 0344cd046d033f9e8a55de02f7935c5cec5dc30b
+    last_write_checksum: sha1:795c14026405d547bfc47012f7ad9666e530fa7f
+    pristine_git_object: 6ca6b37d35a12448da176ee2517cc036db12c81c
   src/lib/http.ts:
     id: 63a80782d37e
     last_write_checksum: sha1:797cbf16d3c7c4d62d3ba0eedb08617524938457
@@ -253,12 +294,16 @@ trackedFiles:
     pristine_git_object: 246c36a57c8545e696499222d7c30496d1569422
   src/lib/security.ts:
     id: 0502afa7922e
-    last_write_checksum: sha1:1d7359985fe9fbb1fdcf7422b3d13103a9f119ed
-    pristine_git_object: a9cfc4db61f7d7b2ad7cf4afd33c7b737bedbec3
+    last_write_checksum: sha1:47ec2401d31ef1639b22323e02a1a2261dad6582
+    pristine_git_object: c685f22c50a733ae013da61936767d3ee91fdcd2
   src/lib/url.ts:
     id: b0057e24ed76
     last_write_checksum: sha1:d124050c7e755c0cce233b9e029afb584ff65201
     pristine_git_object: f3a8de6c021de59c991707946cd294596cae954d
+  src/models/client-credentials-request.ts:
+    id: bb0ebb5b6fbc
+    last_write_checksum: sha1:eb5d4f51cc962cb5fc2bd0ede1159bf6306fdac7
+    pristine_git_object: ade9f6cc51fd15baad1993bfefd8411eaf4e5b08
   src/models/error-response.ts:
     id: 0a1828112515
     last_write_checksum: sha1:fe404d79b0d2b37881e894619c8b446b68715d73
@@ -281,8 +326,12 @@ trackedFiles:
     pristine_git_object: b34f612124c797c2a1106b9735708f679a90b74f
   src/models/errors/index.ts:
     id: c4e22507cb83
-    last_write_checksum: sha1:f96c04ae92f4ce3f38c59cd6a415c5ea43ba803b
-    pristine_git_object: ab6bd85dad56e68ffda2c3c8ad8feecce393ebac
+    last_write_checksum: sha1:f51d7fc90f56d4bcd7358f069f18dd2a721f9ca0
+    pristine_git_object: 6071047e9c3340d89724df06ea58654be0a04a88
+  src/models/errors/o-auth2-error-response.ts:
+    id: 4e2ed718f8b1
+    last_write_checksum: sha1:93349974418fa1dc95a72c9e40627c575c000511
+    pristine_git_object: 3a3ea95fce3bec9fb41968025e656d1c8b78eb18
   src/models/errors/response-validation-error.ts:
     id: a6ce701a9571
     last_write_checksum: sha1:2bdbafe760b592c827ad0da113d9a2a9b511c4bb
@@ -291,66 +340,78 @@ trackedFiles:
     id: 9b17e7ef247f
     last_write_checksum: sha1:92771987c251f02fd86cfd824a3be709cd3c2837
     pristine_git_object: db00022e05d55600252f401eb0e6ab46278e0b07
+  src/models/exchange-request.ts:
+    id: bb1c22c6b47a
+    last_write_checksum: sha1:17ceccbdc26f00a0d185d5df17c43928076ee8f1
+    pristine_git_object: b8c80f50849680890047fb2bee797d4878dc20b8
   src/models/health-response.ts:
     id: b46db3da75f9
     last_write_checksum: sha1:148f205032806b630cd3e5273e694785a8e33d59
     pristine_git_object: 41dbd80834bc4f2136c2d4ff7111f2bdd9961be0
   src/models/index.ts:
     id: f93644b0f37e
-    last_write_checksum: sha1:b06eb620d53db48f3b71f5f8465ce7fc722322e1
-    pristine_git_object: 5d81bbf71767497bc936444cac2e864711550c41
-  src/models/issue-token-request.ts:
-    id: fce57050e1b3
-    last_write_checksum: sha1:3c45045ef3e0159f5ba875534c67424db98813f3
-    pristine_git_object: c11492c6b0d56f6b0bd8ec018213b3d3e92affea
+    last_write_checksum: sha1:eb58e07c80ffd0ba5ebab2b79142fdeef1bac7e9
+    pristine_git_object: b348a4cf97b93c345d02bb22b7df09f55660d2ea
   src/models/jwk-set.ts:
     id: 7008e185f54d
     last_write_checksum: sha1:1ff1370ae8e26f11860658cfad62fb20e5758d89
     pristine_git_object: cb61aef52df92f9c7dc453eae7c9caa73b46cee5
   src/models/operations/index.ts:
     id: 0d9ffaf774d2
-    last_write_checksum: sha1:fb3c28faeadef1c788846916ce5dd6071dfd60f4
-    pristine_git_object: 6449b689b43e2c36cd437c2da36e67e28bed0ad7
-  src/models/operations/issue-fluid-token.ts:
-    id: db1a0bff178d
-    last_write_checksum: sha1:424b75fd058795e3bf09bf623f44e6e4970bc281
-    pristine_git_object: 5ee3b8f5019ff98701e50a59ec92b450e1a53a22
-  src/models/operations/issue-token.ts:
-    id: 585904b49399
-    last_write_checksum: sha1:b2f0fd4f6ae05cfc93af4127414ba1513bc1c8b1
-    pristine_git_object: 2846ac52db72b630463ce2ed6af4743a5af4c67a
+    last_write_checksum: sha1:d60af853f4f452f31eaf4fac8463772e68e54062
+    pristine_git_object: e200b1b9480f49ad71475bdb2f6a5b0d46be79f4
   src/models/operations/issue-user-token.ts:
     id: 9600eb77bba4
-    last_write_checksum: sha1:1f45143e317359f2910e005fe9332bd3d0bcfd9a
-    pristine_git_object: 26fdc58d80272763ddabaeca8fbd705af9506254
+    last_write_checksum: sha1:140cdb8d0382e0cc2aa5f463c495697355cc5aaf
+    pristine_git_object: 882daa03f9c7b5f4ab35ab2a772a4f12f2a8ab2d
+  src/models/refresh-request.ts:
+    id: b2d9e4339514
+    last_write_checksum: sha1:05949354074d40cbcdcbead68ff5dbce6537cc34
+    pristine_git_object: d6db75a4abff9180b9745637746b660cbc203c07
+  src/models/scheme-basic-auth.ts:
+    id: 653c3980ffcf
+    last_write_checksum: sha1:fcc8ca8a01a5d5c183cdf93df0e8d6398ca0738a
+    pristine_git_object: abbaf7af7e8d4ff1e1e4977b2acd34b728d1c839
+  src/models/security.ts:
+    id: d90c6c784ca5
+    last_write_checksum: sha1:6c4a5e24407a47690dd025f130693bb2354fea11
+    pristine_git_object: 40d121d43969420e156c15c1e7b1fb774d1b6b17
+  src/models/session-token-data.ts:
+    id: e23916431b3e
+    last_write_checksum: sha1:18e035aeea0e12856ebbea2051c12813bac7bea1
+    pristine_git_object: 02cd8502ebc28a9658b9ec6b8b93630cc869a2ed
   src/models/token-data.ts:
     id: a34a49bc5f1b
-    last_write_checksum: sha1:55382532b2b4728e8cc6b1b94534f7a945da6d36
-    pristine_git_object: f2b002e2d58df3d26249feb2e643b2c5e4e9db07
+    last_write_checksum: sha1:f154b0830a37f91195c3b28ae7e8dd8aa6370c4b
+    pristine_git_object: ca9ccec5996502b09b9cb488699e4cb2b4954d0f
   src/models/user-token-data.ts:
     id: 42427733924b
-    last_write_checksum: sha1:5b137d567e52371f228ac42b4b3591a35dcddbcc
-    pristine_git_object: 827ae4bfa2d074279e051bc7afbab8048f79ae45
+    last_write_checksum: sha1:c4185064050082324336e9029e76af3887e853e7
+    pristine_git_object: 59af6001fbe7b09cfd434aaf813c80e825565f4b
   src/models/user-token-request.ts:
     id: 5443ab3ec76e
-    last_write_checksum: sha1:6b93418f4e55814175dbf8b34822e2d62f39ed57
-    pristine_git_object: cd2ac9f2e6ba2aa666dc179c48e649a872f6ec41
+    last_write_checksum: sha1:c3fceea0c929a2cea7a2c9f9be1d96df729dae6a
+    pristine_git_object: da1aa32e289df74400e48943b95b912dce67f03e
   src/sdk/index.ts:
     id: a857902a703f
     last_write_checksum: sha1:ed6d64f2a6135349aa8498b8d8cff9ba85c7fb8f
     pristine_git_object: ecac2264817bb369ff2dbf0f0e9029807e67ff77
   src/sdk/metadata.ts:
     id: 573ccbe5f5ad
-    last_write_checksum: sha1:6fdadef6ed89d78d4b32b854fe40c2a3af21025e
-    pristine_git_object: 031e03fe5c33b73754c17a5fcc5bf02bd17250d8
+    last_write_checksum: sha1:9df0d9098a6f238148cffbb96c61b5a2f982e798
+    pristine_git_object: 6dc6f7673b5fddabcad200a6ec19dacc545483bf
   src/sdk/sdk.ts:
     id: 784571af2f69
-    last_write_checksum: sha1:b918bd1810111c5d0c11a65aa35abef471374d53
-    pristine_git_object: 2725396a0cec8671d48a547457bc4b583cdb5943
+    last_write_checksum: sha1:ada11f8ab5f2a0102641c7811b5ffba3e383ed72
+    pristine_git_object: 6bff2f3e1bd762f11b7e0847b802c2dfcbb9f47c
+  src/sdk/session.ts:
+    id: 146a5916151d
+    last_write_checksum: sha1:f953b4f8a8abc5b19d55bf887de98c2442c3848e
+    pristine_git_object: 629b01539e63e01baa9b2ee14782e68e03c91769
   src/sdk/tokens.ts:
     id: f233e5cd99ad
-    last_write_checksum: sha1:5362221774720638466d536300a85904ff5452bd
-    pristine_git_object: a42e952f9020f2338101b61810d54fbe60ab2bbe
+    last_write_checksum: sha1:4b38dbae6164fde8b7394db4255247987cd6875d
+    pristine_git_object: a8def81e756864fe9aeabb409e7f293117c33368
   src/types/async.ts:
     id: fac8da972f86
     last_write_checksum: sha1:3ff07b3feaf390ec1aeb18ff938e139c6c4a9585
@@ -534,25 +595,141 @@ examples:
         application/json: {"external_id": "user-123", "customer_external_id": "loja-a", "email": "alice@acme.com", "given_name": "Alice", "family_name": "Smith", "expires_in": 3600}
       responses:
         "200":
-          application/json: {"ok": true, "data": {"access_token": "<value>", "token_type": "Bearer", "expires_in": 3600}}
+          application/json: {"access_token": "<value>", "token_type": "Bearer", "expires_in": 300}
         "400":
-          application/json: {"ok": false, "error": {"code": "<value>", "message": "<value>"}}
+          application/json: {"error": "{\"code\":\"<value>\",\"message\":\"<value>\"}", "error_description": "invalid client credentials"}
         "502":
-          application/json: {"ok": false, "error": {"code": "<value>", "message": "<value>"}}
+          application/json: {"error": "{\"code\":\"<value>\",\"message\":\"<value>\"}", "error_description": "invalid client credentials"}
     external_id_required:
       requestBody:
         application/json: {"external_id": "user-123", "customer_external_id": "loja-a", "email": "alice@acme.com", "given_name": "Alice", "family_name": "Smith", "expires_in": 3600}
       responses:
         "400":
-          application/json: {"ok": false, "error": {"code": "invalid_request", "message": "external_id is required"}}
+          application/json: {"error": "invalid_request", "error_description": "external_id is required"}
         "502":
-          application/json: {"ok": false, "error": {"code": "invalid_request", "message": "external_id is required"}}
+          application/json: {"error": "invalid_request", "error_description": "external_id is required"}
     email_required:
       requestBody:
         application/json: {"external_id": "user-123", "customer_external_id": "loja-a", "email": "alice@acme.com", "given_name": "Alice", "family_name": "Smith", "expires_in": 3600}
       responses:
         "400":
-          application/json: {"ok": false, "error": {"code": "invalid_request", "message": "email is required for first access provisioning"}}
+          application/json: {"error": "invalid_request", "error_description": "email is required for first access provisioning"}
         "502":
-          application/json: {"ok": false, "error": {"code": "invalid_request", "message": "email is required for first access provisioning"}}
+          application/json: {"error": "invalid_request", "error_description": "email is required for first access provisioning"}
+    invalid_body:
+      requestBody:
+        application/json: {"external_id": "user-123", "customer_external_id": "loja-a", "email": "alice@acme.com", "given_name": "Alice", "family_name": "Smith", "expires_in": 3600}
+      responses:
+        "400":
+          application/json: {"error": "invalid_request", "error_description": "invalid JSON body: ..."}
+        "502":
+          application/json: {"error": "invalid_request", "error_description": "invalid JSON body: ..."}
+  issueM2MToken:
+    speakeasy-default-issue-m2-M-token:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "200":
+          application/json: {"access_token": "<value>", "token_type": "Bearer", "expires_in": 3600, "scope": "fluid:api"}
+        "400":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+        "502":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+    invalid_scope:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "invalid_scope", "error_description": "scope \"admin\" is not allowed"}
+        "502":
+          application/json: {"error": "invalid_scope", "error_description": "scope \"admin\" is not allowed"}
+    unsupported_grant_type:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "unsupported_grant_type", "error_description": "supported grant type: client_credentials"}
+        "502":
+          application/json: {"error": "unsupported_grant_type", "error_description": "supported grant type: client_credentials"}
+    invalid_request:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "invalid_request", "error_description": "client_id and client_secret are required"}
+        "502":
+          application/json: {"error": "invalid_request", "error_description": "client_id and client_secret are required"}
+  issueFluidTokenLegacy:
+    speakeasy-default-issue-fluid-token-legacy:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "200":
+          application/json: {"access_token": "<value>", "token_type": "Bearer", "expires_in": 3600, "scope": "fluid:api"}
+        "400":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+        "502":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+    invalid_scope:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "invalid_scope", "error_description": "scope \"admin\" is not allowed"}
+        "502":
+          application/json: {"error": "invalid_scope", "error_description": "scope \"admin\" is not allowed"}
+    unsupported_grant_type:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "unsupported_grant_type", "error_description": "supported grant type: client_credentials"}
+        "502":
+          application/json: {"error": "unsupported_grant_type", "error_description": "supported grant type: client_credentials"}
+    invalid_request:
+      requestBody:
+        application/x-www-form-urlencoded: {"grant_type": "client_credentials", "client_id": "fld-cred-acme-corp--api--postman-primary", "client_secret": "dGhpcyBpcyBhIHNlY3JldA", "scope": "fluid:api"}
+      responses:
+        "400":
+          application/json: {"error": "invalid_request", "error_description": "client_id and client_secret are required"}
+        "502":
+          application/json: {"error": "invalid_request", "error_description": "client_id and client_secret are required"}
+  exchangeBootstrapToken:
+    speakeasy-default-exchange-bootstrap-token:
+      requestBody:
+        application/json: {"token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."}
+      responses:
+        "200":
+          application/json: {"access_token": "<value>", "token_type": "bearer", "expires_in": 3600}
+        "400":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+        "502":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+  refreshUserSession:
+    speakeasy-default-refresh-user-session:
+      requestBody:
+        application/json: {"refresh_token": "ory_rt_..."}
+      responses:
+        "200":
+          application/json: {"access_token": "<value>", "token_type": "bearer", "expires_in": 3600}
+        "400":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+        "502":
+          application/json: {"error": "invalid_client", "error_description": "invalid client credentials"}
+    invalid_body:
+      requestBody:
+        application/json: {"refresh_token": "ory_rt_..."}
+      responses:
+        "400":
+          application/json: {"error": "invalid_request", "error_description": "invalid JSON body: ..."}
+        "502":
+          application/json: {"error": "invalid_request", "error_description": "invalid JSON body: ..."}
+    invalid_grant:
+      requestBody:
+        application/json: {"refresh_token": "ory_rt_..."}
+      responses:
+        "400":
+          application/json: {"error": "invalid_grant", "error_description": "refresh token is expired or revoked"}
+        "502":
+          application/json: {"error": "invalid_grant", "error_description": "refresh token is expired or revoked"}
 examplesVersion: 1.0.2

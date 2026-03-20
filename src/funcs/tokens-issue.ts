@@ -9,6 +9,7 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
+import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import { FluidapiError } from "../models/errors/fluidapi-error.js";
 import {
@@ -22,36 +23,37 @@ import * as errors from "../models/errors/index.js";
 import { ResponseValidationError } from "../models/errors/response-validation-error.js";
 import { SDKValidationError } from "../models/errors/sdk-validation-error.js";
 import * as models from "../models/index.js";
-import * as operations from "../models/operations/index.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Issue access token (client_credentials)
+ * Issue M2M token (client_credentials)
  *
  * @remarks
- * Standard OAuth2 token endpoint. Performs a `client_credentials` grant
- * against the Authorization Server and returns the access token (JWT).
+ * OAuth2 token endpoint for M2M (machine-to-machine) access.
+ * Only `grant_type=client_credentials` is supported.
+ *
+ * Performs a `client_credentials` grant against the Authorization Server and
+ * returns a Hydra-issued access token (JWT) following RFC 6749 token response format.
  *
  * The OAuth2 client must be registered first via
  * `POST /v1/tenants/{tenant_id}/credentials`.
  *
- * ### Scope reduction
- *
  * By default the token is issued with all scopes configured for the tenant.
- * You can request a subset by passing `scope` in the form body.
- * Requesting a scope not in the tenant's allowlist returns `400 invalid_scope`.
+ * You can request a subset by passing `scope`. Requesting a scope not in the
+ * tenant's allowlist returns `400 invalid_scope`.
  *
- * **Available scopes:** `fluid:api`
+ * > **User session refresh:** use `POST /users/token/refresh` instead.
+ * > The client secret is handled server-side and must not be sent by browsers.
  */
-export function tokensIssueToken(
+export function tokensIssue(
   client: FluidapiCore,
-  request: models.IssueTokenRequest,
+  request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    operations.IssueTokenResponse,
-    | errors.ErrorResponse
+    models.TokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -71,13 +73,13 @@ export function tokensIssueToken(
 
 async function $do(
   client: FluidapiCore,
-  request: models.IssueTokenRequest,
+  request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      operations.IssueTokenResponse,
-      | errors.ErrorResponse
+      models.TokenData,
+      | errors.OAuth2ErrorResponse
       | FluidapiError
       | ResponseValidationError
       | ConnectionError
@@ -92,7 +94,7 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => z.parse(models.IssueTokenRequest$outboundSchema, value),
+    (value) => z.parse(models.ClientCredentialsRequest$outboundSchema, value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -111,15 +113,19 @@ async function $do(
     Accept: "application/json",
   }));
 
+  const secConfig = await extractSecurity(client._options.bearerAuth);
+  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
+  const requestSecurity = resolveGlobalSecurity(securityInput);
+
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "issueToken",
+    operationID: "issueM2MToken",
     oAuth2Scopes: null,
 
-    resolvedSecurity: null,
+    resolvedSecurity: requestSecurity,
 
-    securitySource: null,
+    securitySource: client._options.bearerAuth,
     retryConfig: options?.retries
       || client._options.retryConfig
       || { strategy: "none" },
@@ -127,6 +133,7 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
+    security: requestSecurity,
     method: "POST",
     baseURL: options?.serverURL,
     path: path,
@@ -156,8 +163,8 @@ async function $do(
   };
 
   const [result] = await M.match<
-    operations.IssueTokenResponse,
-    | errors.ErrorResponse
+    models.TokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -167,9 +174,9 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, operations.IssueTokenResponse$inboundSchema),
-    M.jsonErr([400, 401], errors.ErrorResponse$inboundSchema),
-    M.jsonErr(502, errors.ErrorResponse$inboundSchema),
+    M.json(200, models.TokenData$inboundSchema),
+    M.jsonErr([400, 401], errors.OAuth2ErrorResponse$inboundSchema),
+    M.jsonErr(502, errors.OAuth2ErrorResponse$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

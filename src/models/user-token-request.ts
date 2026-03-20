@@ -12,7 +12,10 @@ export type UserTokenRequest = {
   givenName?: string | undefined;
   familyName?: string | undefined;
   /**
-   * Optional token lifetime in seconds.
+   * Requested token lifetime in seconds. Capped at `BOOTSTRAP_TOKEN_TTL_SECONDS`
+   *
+   * @remarks
+   * (default: 300s). Values equal to or above the cap use the cap.
    */
   expiresIn?: number | undefined;
 };

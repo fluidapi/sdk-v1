@@ -32,6 +32,8 @@ export const ServerHost = {
 export type ServerHost = ClosedEnum<typeof ServerHost>;
 
 export type SDKOptions = {
+  bearerAuth?: string | (() => Promise<string>) | undefined;
+
   httpClient?: HTTPClient;
   /**
    * Allows overriding the default server used by the SDK
@@ -88,7 +90,7 @@ export function serverURLFromOptions(options: SDKOptions): URL | null {
 export const SDK_METADATA = {
   language: "typescript",
   openapiDocVersion: "1.0.0",
-  sdkVersion: "0.0.3",
-  genVersion: "2.865.2",
-  userAgent: "speakeasy-sdk/typescript 0.0.3 2.865.2 1.0.0 fluidapi",
+  sdkVersion: "0.2.0",
+  genVersion: "2.866.2",
+  userAgent: "speakeasy-sdk/typescript 0.2.0 2.866.2 1.0.0 fluidapi",
 } as const;

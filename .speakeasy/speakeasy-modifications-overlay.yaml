@@ -1,0 +1,46 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: Speakeasy Modifications
+  version: 0.0.2
+  x-speakeasy-metadata:
+    after: ""
+    before: ""
+    type: speakeasy-modifications
+actions:
+  - target: $["paths"]["/oauth2/token-fluid"]["post"]
+    update:
+      x-speakeasy-name-override: issueFluid
+    x-speakeasy-metadata:
+      after: sdk.tokens.issueFluid()
+      before: sdk.tokens.issueFluidToken()
+      created_at: 1773625906205
+      reviewed_at: 1773625913431
+      type: method-name
+  - target: $["paths"]["/users/token"]["post"]
+    update:
+      x-speakeasy-name-override: issueUser
+    x-speakeasy-metadata:
+      after: sdk.tokens.issueUser()
+      before: sdk.tokens.issueUserToken()
+      created_at: 1773625906206
+      reviewed_at: 1773625913431
+      type: method-name
+  - target: $["paths"]["/.well-known/jwks.json"]["get"]
+    update:
+      x-speakeasy-name-override: getJwks
+    x-speakeasy-metadata:
+      after: sdk.metadata.getJwks()
+      before: sdk.metadata.getJWKS()
+      created_at: 1773625906206
+      reviewed_at: 1773625913431
+      type: method-name
+  - target: $["paths"]["/oauth2/token"]["post"]
+    update:
+      x-speakeasy-name-override: issue
+    x-speakeasy-metadata:
+      after: sdk.tokens.issue()
+      before: sdk.tokens.issueToken()
+      created_at: 1773625906206
+      reviewed_at: 1773625913431
+      type: method-name

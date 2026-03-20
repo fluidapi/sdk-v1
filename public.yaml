@@ -1,0 +1,689 @@
+openapi: "3.1.0"
+
+info:
+  title: Fluid Token API — Public
+  description: |
+    Public contract for token issuance and token-related public endpoints.
+
+    ## Authentication
+
+    - **`/oauth2/token`** — public endpoint; supports `client_credentials` (M2M only).
+    - **`/oauth2/token-fluid-legacy`** — legacy Fluid-signed M2M JWT endpoint (deprecated, prefer `/oauth2/token`).
+    - **`/users/token`** — public endpoint for end-user bootstrap token issuance. Supports Bearer M2M or HTTP Basic Auth.
+    - **`/users/token/exchange`** — exchanges a short-lived bootstrap token for a Hydra-managed session (access_token + refresh_token).
+    - **`/users/token/refresh`** — renews a user session using a Hydra refresh token. The client secret is handled server-side and must not be exposed to browsers.
+    - **`/.well-known/jwks.json`** — public key discovery for Fluid-signed JWT validation.
+
+    ## Scopes
+
+    | Scope | Description |
+    |---|---|
+    | `fluid:api` | Full access to the Fluid API |
+  version: "1.0.0"
+  contact:
+    name: Fluid API Team
+    email: api@fluidapi.com
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+
+servers:
+  - url: "{scheme}://{host}"
+    description: Configurable environment
+    variables:
+      scheme:
+        default: https
+        enum: [http, https]
+      host:
+        default: id.dev.api.fluidapi.io
+        enum:
+          - id.dev.api.fluidapi.io
+          - id.api.fluidapi.io
+          - localhost:9999
+
+security: []
+
+tags:
+  - name: tokens
+    description: Public — Token issuance for tenants
+  - name: session
+    description: Public — User session lifecycle (exchange + refresh)
+  - name: metadata
+    description: Public — Metadata and health endpoints
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags: [metadata]
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: UP
+        "503":
+          description: Service health could not be evaluated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: health_check_error
+                  message: failed to evaluate service health
+
+  /.well-known/jwks.json:
+    get:
+      summary: Get public signing keys
+      description: Returns the JWKS used to validate Fluid-signed JWTs.
+      operationId: getJWKS
+      tags: [metadata]
+      responses:
+        "200":
+          description: JWK set returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWKSet"
+              example:
+                keys:
+                  - kty: RSA
+                    kid: OT9A3u8xcG53oZKbMb7yvr7vb3IkKcJYyjR3ea5pij8
+                    use: sig
+                    alg: RS256
+                    n: "1fi9UyLM..."
+                    e: AQAB
+        "503":
+          description: JWKS temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                ok: false
+                error:
+                  code: jwks_error
+                  message: failed to load jwks
+
+  /oauth2/token:
+    post:
+      summary: Issue M2M token (client_credentials)
+      description: |
+        OAuth2 token endpoint for M2M (machine-to-machine) access.
+        Only `grant_type=client_credentials` is supported.
+
+        Performs a `client_credentials` grant against the Authorization Server and
+        returns a Hydra-issued access token (JWT) following RFC 6749 token response format.
+
+        The OAuth2 client must be registered first via
+        `POST /v1/tenants/{tenant_id}/credentials`.
+
+        By default the token is issued with all scopes configured for the tenant.
+        You can request a subset by passing `scope`. Requesting a scope not in the
+        tenant's allowlist returns `400 invalid_scope`.
+
+        > **User session refresh:** use `POST /users/token/refresh` instead.
+        > The client secret is handled server-side and must not be sent by browsers.
+      operationId: issueM2MToken
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ClientCredentialsRequest"
+            example:
+              grant_type: client_credentials
+              client_id: fld-cred-acme-corp--api--postman-primary
+              client_secret: dGhpcyBpcyBhIHNlY3JldA
+      responses:
+        "200":
+          description: M2M token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenData"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+                token_type: bearer
+                expires_in: 3600
+                scope: "fluid:api"
+        "400":
+          $ref: "#/components/responses/OAuth2BadRequest"
+        "401":
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: invalid_client
+                error_description: invalid client credentials
+        "502":
+          $ref: "#/components/responses/OAuth2BadGateway"
+
+  /oauth2/token-fluid-legacy:
+    post:
+      summary: Issue Fluid-signed M2M token (legacy)
+      description: |
+        **Deprecated** — prefer `POST /oauth2/token` with `grant_type=client_credentials`.
+
+        Validates client credentials against the Authorization Server and generates
+        a JWT signed by Fluid carrying `workspace_id`, `tenant_id`, `client_id`, and
+        `credential_type` claims.
+      operationId: issueFluidTokenLegacy
+      deprecated: true
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ClientCredentialsRequest"
+      responses:
+        "200":
+          description: Fluid-signed M2M token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenData"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+                token_type: bearer
+                expires_in: 3600
+                scope: "fluid:api"
+        "400":
+          $ref: "#/components/responses/OAuth2BadRequest"
+        "401":
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: invalid_client
+                error_description: invalid client credentials
+        "502":
+          $ref: "#/components/responses/OAuth2BadGateway"
+
+  /users/token:
+    post:
+      security:
+        - BearerAuth: []
+        - BasicAuth: []
+      summary: Issue bootstrap token for end user
+      description: |
+        Issues a short-lived bootstrap JWT for an end user (workspace or customer scope).
+
+        The token lifetime is capped at `BOOTSTRAP_TOKEN_TTL_SECONDS` (default: 300s)
+        regardless of the `expires_in` value in the request. This token is single-use
+        and is intended to be exchanged immediately via `POST /users/token/exchange`.
+
+        Supported authentication modes:
+        - `Authorization: Bearer <m2m_token>` — preferred. The token must be a
+          Fluid-signed M2M JWT with `scope` including `fluid:api`.
+          Canonical first-access provisioning is only available in this mode.
+        - HTTP Basic Auth with `client_id` + `client_secret`.
+          Provisioning is skipped in this mode.
+
+        If `customer_external_id` is present, the JWT is issued with `scope: customer`.
+        Otherwise it is issued with `scope: workspace`.
+      operationId: issueUserToken
+      tags: [tokens]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserTokenRequest"
+      responses:
+        "200":
+          description: Bootstrap token issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserTokenData"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+                token_type: bearer
+                expires_in: 300
+        "400":
+          description: Invalid request — malformed body, missing `external_id`, or missing `email` when first-access provisioning is needed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              examples:
+                invalid_body:
+                  value:
+                    error: invalid_request
+                    error_description: "invalid JSON body: ..."
+                external_id_required:
+                  value:
+                    error: invalid_request
+                    error_description: external_id is required
+                email_required:
+                  value:
+                    error: invalid_request
+                    error_description: email is required for first access provisioning
+        "401":
+          description: Invalid client credentials or invalid bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: invalid_client
+                error_description: invalid client credentials
+        "403":
+          description: Insufficient scope, provisioning requires Bearer auth, or customer/user is revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              examples:
+                insufficient_scope:
+                  value:
+                    error: insufficient_scope
+                    error_description: token missing required scope
+                customer_revoked:
+                  value:
+                    error: customer_revoked
+                    error_description: customer is revoked
+                customer_user_revoked:
+                  value:
+                    error: customer_user_revoked
+                    error_description: customer user is revoked
+        "404":
+          description: Workspace user not found or inactive for the tenant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: workspace_user_not_found
+                error_description: workspace user not found or inactive for tenant
+        "409":
+          description: Canonical user lookup returned multiple exact matches
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: user_lookup_ambiguous
+                error_description: user lookup returned multiple exact matches
+        "502":
+          $ref: "#/components/responses/OAuth2BadGateway"
+
+  /users/token/exchange:
+    post:
+      summary: Exchange bootstrap token for user session
+      description: |
+        Exchanges the short-lived bootstrap JWT issued by `POST /users/token` for a
+        Hydra-managed session token pair (`access_token` + `refresh_token`).
+
+        The bootstrap token is **single-use**: a second call with the same token
+        returns `401 invalid_grant`. Claims from the bootstrap token (workspace_id,
+        tenant_id, user_id, etc.) are forwarded into the Hydra session via the
+        server-side authorization code flow.
+
+        The resulting `refresh_token` can be renewed via `POST /users/token/refresh`.
+      operationId: exchangeBootstrapToken
+      tags: [session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExchangeRequest"
+            example:
+              token: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+      responses:
+        "200":
+          description: Session token pair issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionTokenData"
+              example:
+                access_token: "ory_at_..."
+                refresh_token: "ory_rt_..."
+                token_type: bearer
+                expires_in: 3600
+        "400":
+          description: Missing or malformed request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: invalid_request
+                error_description: "invalid JSON body: ..."
+        "401":
+          description: Invalid, expired, or already-used bootstrap token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              examples:
+                invalid_token:
+                  value:
+                    error: invalid_token
+                    error_description: invalid or expired token
+                already_used:
+                  value:
+                    error: invalid_grant
+                    error_description: bootstrap token has already been used
+        "502":
+          $ref: "#/components/responses/OAuth2BadGateway"
+
+  /users/token/refresh:
+    post:
+      summary: Renew user session (refresh token)
+      description: |
+        Exchanges a Hydra refresh token for a new session token pair
+        (`access_token` + `refresh_token`).
+
+        The `fluid-user-session` client credentials are handled server-side.
+        Browsers and mobile clients must **not** hold or send the client secret —
+        only the `refresh_token` is required.
+      operationId: refreshUserSession
+      tags: [session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+            example:
+              refresh_token: "ory_rt_..."
+      responses:
+        "200":
+          description: Session renewed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionTokenData"
+              example:
+                access_token: "ory_at_..."
+                refresh_token: "ory_rt_..."
+                token_type: bearer
+                expires_in: 3600
+        "400":
+          description: Missing/malformed request body, or expired/revoked refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              examples:
+                invalid_body:
+                  value:
+                    error: invalid_request
+                    error_description: "invalid JSON body: ..."
+                invalid_grant:
+                  value:
+                    error: invalid_grant
+                    error_description: refresh token is expired or revoked
+        "401":
+          description: Invalid client credentials (server-side misconfiguration)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2ErrorResponse"
+              example:
+                error: invalid_client
+                error_description: invalid client credentials
+        "502":
+          $ref: "#/components/responses/OAuth2BadGateway"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: UP
+
+    OKResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          description: Success payload
+
+    ErrorResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+            message:
+              type: string
+              description: Human-readable description
+
+    ClientCredentialsRequest:
+      type: object
+      required: [grant_type, client_id, client_secret]
+      properties:
+        grant_type:
+          type: string
+          enum: [client_credentials]
+          example: client_credentials
+        client_id:
+          type: string
+          example: fld-cred-acme-corp--api--postman-primary
+        client_secret:
+          type: string
+          example: "dGhpcyBpcyBhIHNlY3JldA"
+        scope:
+          type: string
+          description: |
+            Space-separated list of scopes to request. Must be a subset of the
+            scopes configured for the tenant. Omit to request all available scopes.
+          example: "fluid:api"
+
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+          description: Hydra refresh token obtained from `/users/token/exchange` or a prior `/users/token/refresh`
+          example: "ory_rt_..."
+
+    ExchangeRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          description: Bootstrap JWT issued by `POST /users/token`
+          example: "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9UO..."
+
+    OAuth2ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: OAuth2 error code (RFC 6749)
+          example: invalid_client
+        error_description:
+          type: string
+          description: Human-readable error description
+          example: invalid client credentials
+
+    TokenData:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        token_type:
+          type: string
+          enum: [Bearer, bearer]
+          example: Bearer
+        expires_in:
+          type: integer
+          description: Token lifetime in seconds
+          example: 3600
+        scope:
+          type: string
+          description: Space-separated list of granted scopes
+          example: "fluid:api"
+
+    SessionTokenData:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token:
+          type: string
+          description: Hydra-issued access token
+        refresh_token:
+          type: string
+          description: Hydra refresh token; use with `POST /users/token/refresh`
+        token_type:
+          type: string
+          enum: [bearer]
+          example: bearer
+        expires_in:
+          type: integer
+          description: Access token lifetime in seconds
+          example: 3600
+
+    UserTokenRequest:
+      type: object
+      required: [external_id]
+      properties:
+        external_id:
+          type: string
+          example: user-123
+        customer_external_id:
+          type: string
+          example: loja-a
+        email:
+          type: string
+          format: email
+          example: alice@acme.com
+        given_name:
+          type: string
+          example: Alice
+        family_name:
+          type: string
+          example: Smith
+        expires_in:
+          type: integer
+          description: |
+            Requested token lifetime in seconds. Capped at `BOOTSTRAP_TOKEN_TTL_SECONDS`
+            (default: 300s). Values equal to or above the cap use the cap.
+          example: 300
+
+    UserTokenData:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          enum: [Bearer, bearer]
+          example: Bearer
+        expires_in:
+          type: integer
+          description: Effective token lifetime in seconds (always set; capped at server config)
+          example: 300
+
+    JWKSet:
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+            required: [kty, kid, use, alg, n, e]
+            properties:
+              kty:
+                type: string
+                example: RSA
+              kid:
+                type: string
+                example: fld-iam-rs256-2026-03
+              use:
+                type: string
+                example: sig
+              alg:
+                type: string
+                example: RS256
+              n:
+                type: string
+              e:
+                type: string
+
+  responses:
+    OAuth2BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuth2ErrorResponse"
+          examples:
+            invalid_scope:
+              summary: Scope not allowed for this tenant
+              value:
+                error: invalid_scope
+                error_description: "scope \"admin\" is not allowed"
+            unsupported_grant_type:
+              summary: Grant type not supported
+              value:
+                error: unsupported_grant_type
+                error_description: "supported grant type: client_credentials"
+            invalid_request:
+              summary: Missing required fields
+              value:
+                error: invalid_request
+                error_description: client_id and client_secret are required
+
+    OAuth2BadGateway:
+      description: Upstream dependency unavailable or token processing failed unexpectedly
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuth2ErrorResponse"
+          examples:
+            token_error:
+              value:
+                error: token_error
+                error_description: failed to process token request
+            user_provisioning_failed:
+              value:
+                error: user_provisioning_failed
+                error_description: failed to provision canonical user

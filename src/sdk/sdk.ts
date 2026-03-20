@@ -4,6 +4,7 @@
 
 import { ClientSDK } from "../lib/sdks.js";
 import { Metadata } from "./metadata.js";
+import { Session } from "./session.js";
 import { Tokens } from "./tokens.js";
 
 export class Fluidapi extends ClientSDK {
@@ -15,5 +16,10 @@ export class Fluidapi extends ClientSDK {
   private _tokens?: Tokens;
   get tokens(): Tokens {
     return (this._tokens ??= new Tokens(this._options));
+  }
+
+  private _session?: Session;
+  get session(): Session {
+    return (this._session ??= new Session(this._options));
   }
 }

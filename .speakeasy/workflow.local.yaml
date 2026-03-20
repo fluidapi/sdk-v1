@@ -12,15 +12,17 @@
 # workflowVersion: 1.0.0
 # speakeasyVersion: latest
 # sources:
-#   auth:
-#     inputs:
-#       - location: ../public.yaml
-#     registry:
-#       location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
+#     auth:
+#         inputs:
+#             - location: ./public.yaml
+#         overlays:
+#             - location: .speakeasy/speakeasy-modifications-overlay.yaml
+#         registry:
+#             location: registry.speakeasyapi.dev/fluid/iam-sjd/auth
 # targets:
-#   fluidapi:
-#     target: typescript
-#     source: auth
-#     publish:
-#       npm:
-#         token: $npm_token
+#     fluidapi:
+#         target: typescript
+#         source: auth
+#         publish:
+#             npm:
+#                 token: $npm_token

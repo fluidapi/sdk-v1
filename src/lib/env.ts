@@ -6,10 +6,14 @@ import * as z from "zod/v4-mini";
 import { dlv } from "./dlv.js";
 
 export interface Env {
+  FLUIDAPI_BEARER_AUTH?: string | undefined;
+
   FLUIDAPI_DEBUG?: boolean | undefined;
 }
 
 export const envSchema: z.ZodMiniType<Env, unknown> = z.object({
+  FLUIDAPI_BEARER_AUTH: z.optional(z.string()),
+
   FLUIDAPI_DEBUG: z.optional(z.coerce.boolean()),
 });
 

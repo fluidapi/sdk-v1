@@ -17,9 +17,11 @@ Fluid Token API — Public: Public contract for token issuance and token-related
 
 ## Authentication
 
-- **`/oauth2/token`** — public endpoint, no authentication required (client authenticates via `client_id` + `client_secret`).
-- **`/oauth2/token-fluid`** — public endpoint for Fluid-signed M2M JWT issuance.
-- **`/users/token`** — public endpoint for end-user token issuance. Supports Bearer M2M or HTTP Basic Auth.
+- **`/oauth2/token`** — public endpoint; supports `client_credentials` (M2M only).
+- **`/oauth2/token-fluid-legacy`** — legacy Fluid-signed M2M JWT endpoint (deprecated, prefer `/oauth2/token`).
+- **`/users/token`** — public endpoint for end-user bootstrap token issuance. Supports Bearer M2M or HTTP Basic Auth.
+- **`/users/token/exchange`** — exchanges a short-lived bootstrap token for a Hydra-managed session (access_token + refresh_token).
+- **`/users/token/refresh`** — renews a user session using a Hydra refresh token. The client secret is handled server-side and must not be exposed to browsers.
 - **`/.well-known/jwks.json`** — public key discovery for Fluid-signed JWT validation.
 
 ## Scopes
@@ -33,10 +35,12 @@ Fluid Token API — Public: Public contract for token issuance and token-related
 ## Table of Contents
 <!-- $toc-max-depth=2 -->
 * [fluidapi](#fluidapi)
+  * [Authentication](#authentication)
   * [Scopes](#scopes)
   * [SDK Installation](#sdk-installation)
   * [Requirements](#requirements)
   * [SDK Example Usage](#sdk-example-usage)
+  * [Authentication](#authentication-1)
   * [Available Resources and Operations](#available-resources-and-operations)
   * [Standalone functions](#standalone-functions)
   * [Retries](#retries)
@@ -98,7 +102,9 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi();
+const fluidapi = new Fluidapi({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck();
@@ -111,6 +117,61 @@ run();
 ```
 <!-- End SDK Example Usage [usage] -->
 
+<!-- Start Authentication [security] -->
+## Authentication
+
+### Per-Client Security Schemes
+
+This SDK supports the following security scheme globally:
+
+| Name         | Type | Scheme      | Environment Variable   |
+| ------------ | ---- | ----------- | ---------------------- |
+| `bearerAuth` | http | HTTP Bearer | `FLUIDAPI_BEARER_AUTH` |
+
+To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
+```typescript
+import { Fluidapi } from "fluidapi";
+
+const fluidapi = new Fluidapi({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
+
+async function run() {
+  const result = await fluidapi.metadata.healthCheck();
+
+  console.log(result);
+}
+
+run();
+
+```
+
+### Per-Operation Security Schemes
+
+Some operations in this SDK require the security scheme to be specified at the request level. For example:
+```typescript
+import { Fluidapi } from "fluidapi";
+
+const fluidapi = new Fluidapi();
+
+async function run() {
+  const result = await fluidapi.tokens.issueUser({}, {
+    externalId: "user-123",
+    customerExternalId: "loja-a",
+    email: "alice@acme.com",
+    givenName: "Alice",
+    familyName: "Smith",
+    expiresIn: 3600,
+  });
+
+  console.log(result);
+}
+
+run();
+
+```
+<!-- End Authentication [security] -->
+
 <!-- Start Available Resources and Operations [operations] -->
 ## Available Resources and Operations
 
@@ -120,13 +181,18 @@ run();
 ### [Metadata](docs/sdks/metadata/README.md)
 
 * [healthCheck](docs/sdks/metadata/README.md#healthcheck) - Health check
-* [getJWKS](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
+* [getJwks](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
+
+### [Session](docs/sdks/session/README.md)
+
+* [exchangeBootstrapToken](docs/sdks/session/README.md#exchangebootstraptoken) - Exchange bootstrap token for user session
+* [refreshUserSession](docs/sdks/session/README.md#refreshusersession) - Renew user session (refresh token)
 
 ### [Tokens](docs/sdks/tokens/README.md)
 
-* [issueToken](docs/sdks/tokens/README.md#issuetoken) - Issue access token (client_credentials)
-* [issueFluidToken](docs/sdks/tokens/README.md#issuefluidtoken) - Issue Fluid-signed M2M token
-* [issueUserToken](docs/sdks/tokens/README.md#issueusertoken) - Issue end-user token
+* [issue](docs/sdks/tokens/README.md#issue) - Issue M2M token (client_credentials)
+* [~~issueFluidTokenLegacy~~](docs/sdks/tokens/README.md#issuefluidtokenlegacy) - Issue Fluid-signed M2M token (legacy) :warning: **Deprecated**
+* [issueUser](docs/sdks/tokens/README.md#issueuser) - Issue bootstrap token for end user
 
 </details>
 <!-- End Available Resources and Operations [operations] -->
@@ -146,11 +212,13 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [`metadataGetJWKS`](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
+- [`metadataGetJwks`](docs/sdks/metadata/README.md#getjwks) - Get public signing keys
 - [`metadataHealthCheck`](docs/sdks/metadata/README.md#healthcheck) - Health check
-- [`tokensIssueFluidToken`](docs/sdks/tokens/README.md#issuefluidtoken) - Issue Fluid-signed M2M token
-- [`tokensIssueToken`](docs/sdks/tokens/README.md#issuetoken) - Issue access token (client_credentials)
-- [`tokensIssueUserToken`](docs/sdks/tokens/README.md#issueusertoken) - Issue end-user token
+- [`sessionExchangeBootstrapToken`](docs/sdks/session/README.md#exchangebootstraptoken) - Exchange bootstrap token for user session
+- [`sessionRefreshUserSession`](docs/sdks/session/README.md#refreshusersession) - Renew user session (refresh token)
+- [`tokensIssue`](docs/sdks/tokens/README.md#issue) - Issue M2M token (client_credentials)
+- [`tokensIssueUser`](docs/sdks/tokens/README.md#issueuser) - Issue bootstrap token for end user
+- ~~[`tokensIssueFluidTokenLegacy`](docs/sdks/tokens/README.md#issuefluidtokenlegacy)~~ - Issue Fluid-signed M2M token (legacy) :warning: **Deprecated**
 
 </details>
 <!-- End Standalone functions [standalone-funcs] -->
@@ -164,7 +232,9 @@ To change the default retry strategy for a single API call, simply provide a ret
 ```typescript
 import { Fluidapi } from "fluidapi";
 
-const fluidapi = new Fluidapi();
+const fluidapi = new Fluidapi({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   const result = await fluidapi.metadata.healthCheck({
@@ -202,6 +272,7 @@ const fluidapi = new Fluidapi({
     },
     retryConnectionErrors: false,
   },
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -234,7 +305,9 @@ run();
 import { Fluidapi } from "fluidapi";
 import * as errors from "fluidapi/models/errors";
 
-const fluidapi = new Fluidapi();
+const fluidapi = new Fluidapi({
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
+});
 
 async function run() {
   try {
@@ -263,11 +336,10 @@ run();
 ```
 
 ### Error Classes
-**Primary errors:**
+**Primary error:**
 * [`FluidapiError`](./src/models/errors/fluidapi-error.ts): The base class for HTTP error responses.
-  * [`ErrorResponse`](./src/models/errors/error-response.ts): Generic error.
 
-<details><summary>Less common errors (6)</summary>
+<details><summary>Less common errors (8)</summary>
 
 <br />
 
@@ -280,9 +352,13 @@ run();
 
 
 **Inherit from [`FluidapiError`](./src/models/errors/fluidapi-error.ts)**:
+* [`OAuth2ErrorResponse`](./src/models/errors/o-auth2-error-response.ts): Invalid request parameters. Applicable to 5 of 7 methods.*
+* [`ErrorResponse`](./src/models/errors/error-response.ts): Status code `503`. Applicable to 2 of 7 methods.*
 * [`ResponseValidationError`](./src/models/errors/response-validation-error.ts): Type mismatch between the data returned from the server and the structure expected by the SDK. See `error.rawValue` for the raw value and `error.pretty()` for a nicely formatted multi-line string.
 
 </details>
+
+\* Check [the method documentation](#available-resources-and-operations) to see if the error is applicable.
 <!-- End Error Handling [errors] -->
 
 <!-- Start Server Selection [server] -->
@@ -306,6 +382,7 @@ const fluidapi = new Fluidapi({
   serverIdx: 0,
   scheme: "https",
   host: "localhost:9999",
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -326,6 +403,7 @@ import { Fluidapi } from "fluidapi";
 
 const fluidapi = new Fluidapi({
   serverURL: "https://id.dev.api.fluidapi.io",
+  bearerAuth: process.env["FLUIDAPI_BEARER_AUTH"] ?? "",
 });
 
 async function run() {

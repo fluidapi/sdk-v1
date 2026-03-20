@@ -9,6 +9,7 @@ import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
+import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import { FluidapiError } from "../models/errors/fluidapi-error.js";
 import {
@@ -22,30 +23,29 @@ import * as errors from "../models/errors/index.js";
 import { ResponseValidationError } from "../models/errors/response-validation-error.js";
 import { SDKValidationError } from "../models/errors/sdk-validation-error.js";
 import * as models from "../models/index.js";
-import * as operations from "../models/operations/index.js";
 import { APICall, APIPromise } from "../types/async.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Issue Fluid-signed M2M token
+ * Issue Fluid-signed M2M token (legacy)
  *
  * @remarks
- * Validates client credentials against the Authorization Server and then
- * generates a JWT signed by Fluid.
+ * **Deprecated** — prefer `POST /oauth2/token` with `grant_type=client_credentials`.
  *
- * This endpoint coexists with `/oauth2/token`.
- * Use `/oauth2/token` when you want the standard Hydra-backed token flow.
- * Use `/oauth2/token-fluid` when you need a Fluid-signed JWT carrying
- * `workspace_id`, `tenant_id`, `client_id`, and `credential_type` claims for M2M calls.
+ * Validates client credentials against the Authorization Server and generates
+ * a JWT signed by Fluid carrying `workspace_id`, `tenant_id`, `client_id`, and
+ * `credential_type` claims.
+ *
+ * @deprecated method: This will be removed in a future release, please migrate away from it as soon as possible.
  */
-export function tokensIssueFluidToken(
+export function tokensIssueFluidTokenLegacy(
   client: FluidapiCore,
-  request: models.IssueTokenRequest,
+  request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    operations.IssueFluidTokenResponse,
-    | errors.ErrorResponse
+    models.TokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -65,13 +65,13 @@ export function tokensIssueFluidToken(
 
 async function $do(
   client: FluidapiCore,
-  request: models.IssueTokenRequest,
+  request: models.ClientCredentialsRequest,
   options?: RequestOptions,
 ): Promise<
   [
     Result<
-      operations.IssueFluidTokenResponse,
-      | errors.ErrorResponse
+      models.TokenData,
+      | errors.OAuth2ErrorResponse
       | FluidapiError
       | ResponseValidationError
       | ConnectionError
@@ -86,7 +86,7 @@ async function $do(
 > {
   const parsed = safeParse(
     request,
-    (value) => z.parse(models.IssueTokenRequest$outboundSchema, value),
+    (value) => z.parse(models.ClientCredentialsRequest$outboundSchema, value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -98,22 +98,26 @@ async function $do(
     return encodeBodyForm(k, v, { charEncoding: "percent" });
   }).join("&");
 
-  const path = pathToFunc("/oauth2/token-fluid")();
+  const path = pathToFunc("/oauth2/token-fluid-legacy")();
 
   const headers = new Headers(compactMap({
     "Content-Type": "application/x-www-form-urlencoded",
     Accept: "application/json",
   }));
 
+  const secConfig = await extractSecurity(client._options.bearerAuth);
+  const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
+  const requestSecurity = resolveGlobalSecurity(securityInput);
+
   const context = {
     options: client._options,
     baseURL: options?.serverURL ?? client._baseURL ?? "",
-    operationID: "issueFluidToken",
+    operationID: "issueFluidTokenLegacy",
     oAuth2Scopes: null,
 
-    resolvedSecurity: null,
+    resolvedSecurity: requestSecurity,
 
-    securitySource: null,
+    securitySource: client._options.bearerAuth,
     retryConfig: options?.retries
       || client._options.retryConfig
       || { strategy: "none" },
@@ -121,6 +125,7 @@ async function $do(
   };
 
   const requestRes = client._createRequest(context, {
+    security: requestSecurity,
     method: "POST",
     baseURL: options?.serverURL,
     path: path,
@@ -150,8 +155,8 @@ async function $do(
   };
 
   const [result] = await M.match<
-    operations.IssueFluidTokenResponse,
-    | errors.ErrorResponse
+    models.TokenData,
+    | errors.OAuth2ErrorResponse
     | FluidapiError
     | ResponseValidationError
     | ConnectionError
@@ -161,9 +166,9 @@ async function $do(
     | UnexpectedClientError
     | SDKValidationError
   >(
-    M.json(200, operations.IssueFluidTokenResponse$inboundSchema),
-    M.jsonErr([400, 401], errors.ErrorResponse$inboundSchema),
-    M.jsonErr(502, errors.ErrorResponse$inboundSchema),
+    M.json(200, models.TokenData$inboundSchema),
+    M.jsonErr([400, 401], errors.OAuth2ErrorResponse$inboundSchema),
+    M.jsonErr(502, errors.OAuth2ErrorResponse$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),
   )(response, req, { extraFields: responseFields });

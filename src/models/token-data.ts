@@ -5,22 +5,24 @@
 import * as z from "zod/v4-mini";
 import { remap as remap$ } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
-import { ClosedEnum } from "../types/enums.js";
+import * as openEnums from "../types/enums.js";
+import { OpenEnum } from "../types/enums.js";
 import { Result as SafeParseResult } from "../types/fp.js";
 import * as types from "../types/primitives.js";
 import { SDKValidationError } from "./errors/sdk-validation-error.js";
 
-export const TokenType = {
-  Bearer: "bearer",
+export const TokenDataTokenType = {
+  BearerMixed: "Bearer",
+  BearerLower: "bearer",
 } as const;
-export type TokenType = ClosedEnum<typeof TokenType>;
+export type TokenDataTokenType = OpenEnum<typeof TokenDataTokenType>;
 
 export type TokenData = {
   /**
    * JWT access token
    */
   accessToken: string;
-  tokenType: TokenType;
+  tokenType: TokenDataTokenType;
   /**
    * Token lifetime in seconds
    */
@@ -28,22 +30,23 @@ export type TokenData = {
   /**
    * Space-separated list of granted scopes
    */
-  scope: string;
+  scope?: string | undefined;
 };
 
 /** @internal */
-export const TokenType$inboundSchema: z.ZodMiniEnum<typeof TokenType> = z.enum(
-  TokenType,
-);
+export const TokenDataTokenType$inboundSchema: z.ZodMiniType<
+  TokenDataTokenType,
+  unknown
+> = openEnums.inboundSchema(TokenDataTokenType);
 
 /** @internal */
 export const TokenData$inboundSchema: z.ZodMiniType<TokenData, unknown> = z
   .pipe(
     z.object({
       access_token: types.string(),
-      token_type: TokenType$inboundSchema,
+      token_type: TokenDataTokenType$inboundSchema,
       expires_in: types.number(),
-      scope: types.string(),
+      scope: types.optional(types.string()),
     }),
     z.transform((v) => {
       return remap$(v, {

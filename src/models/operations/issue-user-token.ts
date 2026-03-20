@@ -3,35 +3,41 @@
  */
 
 import * as z from "zod/v4-mini";
-import { safeParse } from "../../lib/schemas.js";
-import { Result as SafeParseResult } from "../../types/fp.js";
-import * as types from "../../types/primitives.js";
-import { SDKValidationError } from "../errors/sdk-validation-error.js";
+import { remap as remap$ } from "../../lib/primitives.js";
 import * as models from "../index.js";
 
-/**
- * User token issued
- */
-export type IssueUserTokenResponse = {
-  ok: boolean;
-  data?: models.UserTokenData | undefined;
+export type IssueUserTokenSecurity = {
+  bearerAuth?: string | undefined;
+  basicAuth?: models.SchemeBasicAuth | undefined;
 };
 
 /** @internal */
-export const IssueUserTokenResponse$inboundSchema: z.ZodMiniType<
-  IssueUserTokenResponse,
-  unknown
-> = z.object({
-  ok: types.boolean(),
-  data: types.optional(models.UserTokenData$inboundSchema),
-});
+export type IssueUserTokenSecurity$Outbound = {
+  BearerAuth?: string | undefined;
+  BasicAuth?: models.SchemeBasicAuth$Outbound | undefined;
+};
 
-export function issueUserTokenResponseFromJSON(
-  jsonString: string,
-): SafeParseResult<IssueUserTokenResponse, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => IssueUserTokenResponse$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'IssueUserTokenResponse' from JSON`,
+/** @internal */
+export const IssueUserTokenSecurity$outboundSchema: z.ZodMiniType<
+  IssueUserTokenSecurity$Outbound,
+  IssueUserTokenSecurity
+> = z.pipe(
+  z.object({
+    bearerAuth: z.optional(z.string()),
+    basicAuth: z.optional(models.SchemeBasicAuth$outboundSchema),
+  }),
+  z.transform((v) => {
+    return remap$(v, {
+      bearerAuth: "BearerAuth",
+      basicAuth: "BasicAuth",
+    });
+  }),
+);
+
+export function issueUserTokenSecurityToJSON(
+  issueUserTokenSecurity: IssueUserTokenSecurity,
+): string {
+  return JSON.stringify(
+    IssueUserTokenSecurity$outboundSchema.parse(issueUserTokenSecurity),
   );
 }
