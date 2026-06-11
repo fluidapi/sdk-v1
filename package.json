@@ -1,6 +1,6 @@
 {
   "name": "fluidapi",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "Denis",
   "type": "module",
   "main": "./esm/index.js",
@@ -43,8 +43,12 @@
     }
   },
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fluidapi/sdk-v1.git"
+  },
   "scripts": {
-    "lint": "oxlint --max-warnings=0 --deny-warnings 'src/**/*.{ts,tsx}'",
+    "lint": "oxlint --max-warnings=0 --deny-warnings src/**/*.ts src/**/*.tsx",
     "build": "tsgo",
     "prepublishOnly": "npm run build"
   },
@@ -53,7 +57,7 @@
   },
   "devDependencies": {
     "@typescript/native-preview": "7.0.0-dev.20260302.1",
-    "oxlint": "^1.50.0",
+    "oxlint": "^1.60.0",
     "typescript": "~5.8.3"
   },
   "dependencies": {

@@ -5,6 +5,7 @@
 import * as z from "zod/v4-mini";
 import { FluidapiCore } from "../core.js";
 import { encodeFormQuery, encodeSimple } from "../lib/encodings.js";
+import { matchStatusCode } from "../lib/http.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -32,6 +33,8 @@ import { Result } from "../types/fp.js";
  * Removes an active flowkit instance for the authenticated tenant.
  *
  * The activation to be removed is identified by query parameters.
+ *
+ * If set, this operation will use {@link Security.bearerAuth} from the global security.
  */
 export function activationsDeleteFlowkitActivation(
   client: FluidapiCore,
@@ -107,7 +110,7 @@ async function $do(
 
   const secConfig = await extractSecurity(client._options.bearerAuth);
   const securityInput = secConfig == null ? {} : { bearerAuth: secConfig };
-  const requestSecurity = resolveGlobalSecurity(securityInput);
+  const requestSecurity = resolveGlobalSecurity(securityInput, [0]);
 
   const context = {
     options: client._options,
@@ -142,7 +145,8 @@ async function $do(
 
   const doResult = await client._do(req, {
     context,
-    errorCodes: ["401", "404", "4XX", "5XX"],
+    isErrorStatusCode: (statusCode: number) =>
+      matchStatusCode({ status: statusCode } as Response, ["4XX", "5XX"]),
     retryConfig: context.retryConfig,
     retryCodes: context.retryCodes,
   });

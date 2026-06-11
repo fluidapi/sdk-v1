@@ -1,4 +1,4 @@
-speakeasyVersion: 1.759.0
+speakeasyVersion: 1.776.0
 sources:
     auth:
         sourceNamespace: auth
